@@ -1,7 +1,7 @@
-from asyncio import sleep
 import logging
+from asyncio import sleep
 
-from aio_pika import connect_robust, RobustConnection
+from aio_pika import RobustConnection, connect_robust
 from aio_pika.patterns import RPC
 
 from settings.config import get_admin_settings, get_amqp_settings

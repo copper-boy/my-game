@@ -18,8 +18,9 @@ async def verify_password(password: str, hashed_password: str) -> bool:
     :return: True if hash and password did match else False
     """
     try:
-        return pwd_context.verify(password, hashed_password)
-    except Exception:
+        is_verified = pwd_context.verify(password, hashed_password)
+        return is_verified
+    except (ValueError, TypeError):
         return False
 
 
@@ -30,13 +31,16 @@ async def get_password_hash(password: str) -> str:
     :param: password: not encrypted password
     :return: hashed password
     """
-    return pwd_context.hash(password)
+    hashed_password = pwd_context.hash(password)
+    return hashed_password
 
 
 async def authenticate_user(auth_data: AuthSchema) -> UserModel:
     user = await UserModel.get(email=auth_data.email)
 
-    if not user or not await verify_password(auth_data.password, user.password):
+    is_password_verified = await verify_password(auth_data.password, user.password)
+
+    if not user or not is_password_verified:
         raise HTTPException(status_code=403,
                             detail='incorrect login data posted')
     return user
@@ -46,8 +50,10 @@ async def register_user(email: EmailStr, password: str) -> UserModel | None:
     try:
         exists_user = await UserModel.get_or_none(email=email)
         if exists_user is None:
+            hashed_password = await get_password_hash(password)
+
             user = await UserModel.create(email=email,
-                                          password=await get_password_hash(password))
+                                          password=hashed_password)
         else:
             user = exists_user
     except (IncompleteInstanceError, IntegrityError):

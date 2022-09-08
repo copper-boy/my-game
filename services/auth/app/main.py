@@ -1,4 +1,4 @@
-from asyncio import get_event_loop, ensure_future
+from asyncio import ensure_future, get_event_loop
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -40,7 +40,7 @@ async def startup() -> None:
 async def root() -> JSONResponse:
     return JSONResponse(status_code=200,
                         content={
-                            'detail': 'pong'
+                            'ping': 'pong'
                         })
 
 register_tortoise(app,

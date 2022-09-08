@@ -1,12 +1,11 @@
 from fastapi import APIRouter
-from fastapi.param_functions import Depends
 from fastapi.exceptions import HTTPException
+from fastapi.param_functions import Depends
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
-from tortoise.exceptions import IncompleteInstanceError, IntegrityError
 
-
-from orm.user import AdminModel, admin_pydantic_out, UserModel, user_pydantic_out
+from orm.user import (AdminModel, UserModel, admin_pydantic_out,
+                      user_pydantic_out)
 from schemas.auth import AuthSchema, RegistrationSchema
 from utils.auth import authenticate_user, register_user
 from utils.decorators import login_required
@@ -17,6 +16,10 @@ router = APIRouter()
 @router.post('/registration')
 async def registration(registration_data: RegistrationSchema) -> JSONResponse:
     user = await register_user(registration_data.email, registration_data.password)
+
+    if user is not None:
+        raise HTTPException(status_code=400,
+                            detail='cannot register new user')
     user_pydantic = await user_pydantic_out.from_tortoise_orm(user)
 
     return JSONResponse(status_code=200,

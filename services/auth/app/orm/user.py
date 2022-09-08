@@ -1,6 +1,6 @@
 from tortoise import Model
 from tortoise.contrib.pydantic import pydantic_model_creator
-from tortoise.fields.data import CharField, BigIntField
+from tortoise.fields.data import BigIntField, CharField
 from tortoise.fields.relational import ForeignKeyField, ForeignKeyRelation
 
 
