@@ -36,4 +36,3 @@ def register_http_exception_handler(app: FastAPI) -> None:
 def register_all_exception_handlers(app: FastAPI) -> None:
     register_authjwt_exception_handler(app)
     register_http_exception_handler(app)
-
