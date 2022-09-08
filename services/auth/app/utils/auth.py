@@ -60,3 +60,4 @@ async def register_user(email: EmailStr, password: str) -> UserModel | None:
         await UserModel.get(email=email).delete()
     else:
         return user
+

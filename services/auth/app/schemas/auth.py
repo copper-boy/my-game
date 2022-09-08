@@ -9,3 +9,4 @@ class RegistrationSchema(BaseModel):
 class AuthSchema(BaseModel):
     email: EmailStr
     password: str
+

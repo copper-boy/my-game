@@ -22,3 +22,4 @@ class AdminModel(Model):
 
 
 admin_pydantic_out = pydantic_model_creator(AdminModel, name='AdminModelOutSchema')
+

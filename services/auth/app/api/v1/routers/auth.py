@@ -83,3 +83,4 @@ async def current(authorize: AuthJWT = Depends()) -> JSONResponse:
                                 'admin': admin_pydantic.__dict__
                             }
                         })
+
