@@ -29,6 +29,18 @@ services:
       - 8080
     depends_on:
       - rabbitmq_service
+
+  bot_service:
+    image: my-game-bot:latest
+    command: python main.py
+    build: ./services/bot/
+    volumes:
+      - ./services/bot/app/:/app/
+    env_file:
+      - .env
+      - .telegram.env
+    depends_on:
+      - rabbitmq_service
   rabbitmq_service:
     image: rabbitmq:management
     environment:
