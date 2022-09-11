@@ -23,5 +23,6 @@ class TelegramAccessor(BaseAccessor):
                     }
             ) as response:
                 json = await response.json()
+                self.logger.info(json)
 
         return json['result']
