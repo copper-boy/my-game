@@ -19,7 +19,7 @@ async def register_methods(rpc: RPC) -> None:
 
 
 async def get_robust_connection(loop) -> RobustConnection:
-    while True:
+    for _unused in range(10):
         try:
             connection = await connect_robust(get_amqp_settings().AMQP_URI, loop=loop)
         except ConnectionError:

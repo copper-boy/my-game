@@ -1,17 +1,14 @@
 from asyncio import ensure_future, get_event_loop
 
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from tortoise.contrib.fastapi import register_tortoise
 
 from api import api_router
-from utils.admin import create_admin
-from utils.auth import register_user
 from settings.config import JWTSettingsSchema, get_database_settings
 from settings.handlers import register_all_exception_handlers
 from settings.middlewares import setup_middlewares
-from settings.rabbitmq import consume
+from settings.rabbit import consume
 
 
 @AuthJWT.load_config
@@ -45,4 +42,3 @@ register_tortoise(app,
                   },
                   generate_schemas=True,
                   add_exception_handlers=True)
-

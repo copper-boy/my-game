@@ -10,7 +10,7 @@ logger = getLogger('rabbitmq')
 
 
 async def get_rabbit_connection(loop) -> Connection:
-    while True:
+    for _unused in range(10):
         try:
             connection = await connect(get_amqp_settings().AMQP_URI, loop=loop)
         except ConnectionError:
