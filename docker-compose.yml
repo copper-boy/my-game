@@ -23,10 +23,8 @@ services:
       - .admin.env
       - .env
       - .keys.env
-    ports:
-      - '8080:8080'
     expose:
-      - 8080
+      - 8956
     depends_on:
       - auth_db
       - rabbitmq_service
@@ -62,10 +60,8 @@ services:
     env_file:
       - .env
       - .site.env
-    ports:
-      - '8081:8081'
     expose:
-      - 8081
+      - 14961
     depends_on:
       - logic_db
   rabbitmq_service:
