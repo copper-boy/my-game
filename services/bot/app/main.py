@@ -9,12 +9,12 @@ logger = getLogger(__name__)
 
 
 async def main() -> None:
-    logger.info(f'telegram bot started at {datetime.now()}')
     store = Store()
 
     loop = get_event_loop()
     connection = await get_rabbit_connection(loop)
 
+    logger.info(f'telegram bot started at {datetime.now()}')
     offset = 0
     while True:
         try:
@@ -22,7 +22,7 @@ async def main() -> None:
             for update in updates:
                 offset = update['update_id'] + 1
             await send(connection=connection, message=updates)
-        except KeyboardInterrupt:
+        except Exception:
             logger.info(f'telegram bot stopped at {datetime.now()}')
 
 if __name__ == '__main__':
