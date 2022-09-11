@@ -62,7 +62,7 @@ async def post_question(data: question_pydantic_in, theme_id: int = Query(...)) 
     return question
 
 
-@router.get('/list/game')
+@router.get('/get/games')
 async def game_list() -> dict:
     games = await get_game_list()
     result: list[game_pydantic_out] = [game_pydantic_out.from_orm(game) async for game in games]
@@ -72,7 +72,7 @@ async def game_list() -> dict:
     }
 
 
-@router.get('/list/theme')
+@router.get('/get/themes')
 async def list_theme(game_id: int = Query(...)) -> dict:
     game = await get_game_by_id(game_id)
     result: list[theme_pydantic_out] = [theme_pydantic_out.from_orm(theme) async for theme in game.themes]
@@ -82,7 +82,7 @@ async def list_theme(game_id: int = Query(...)) -> dict:
     }
 
 
-@router.get('/list/question')
+@router.get('/get/questions')
 async def list_questions(theme_id: int = Query(...)):
     theme = await get_theme_by_id(theme_id)
     result: list[question_pydantic_out] = [question_pydantic_out.from_orm(question) async for question in
@@ -93,14 +93,6 @@ async def list_questions(theme_id: int = Query(...)):
     }
 
 
-@router.get('/get/answer')
-async def get_answer(question_id: int = Query(...)) -> answer_pydantic_out:
-    question = await get_question_by_id(question_id)
-    answer = await get_answer_by_question(question)
-
-    return answer
-
-
 @router.get('/get/question')
 async def get_question(theme_id: int = Query(...),
                        cost: int = Query(...)) -> question_pydantic_out:
@@ -108,3 +100,11 @@ async def get_question(theme_id: int = Query(...),
     question = await theme.questions.filter(cost=cost)
 
     return question
+
+
+@router.get('/get/answer')
+async def get_answer(question_id: int = Query(...)) -> answer_pydantic_out:
+    question = await get_question_by_id(question_id)
+    answer = await get_answer_by_question(question)
+
+    return answer

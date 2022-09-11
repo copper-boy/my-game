@@ -25,4 +25,3 @@ async def rpc_middleware(request: Request, call_next: Callable) -> Response:
 
 def setup_middlewares(app: FastAPI) -> None:
     app.middleware('http')(rpc_middleware)
-

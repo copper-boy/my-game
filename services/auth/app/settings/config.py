@@ -46,4 +46,3 @@ class JWTSettingsSchema(BaseModel):
     authjwt_algorithm: str = get_jwt_settings().JWT_ALGORITHM
     authjwt_public_key: str = get_jwt_settings().JWT_PUBLIC_KEY
     authjwt_private_key: str = get_jwt_settings().JWT_PRIVATE_KEY
-

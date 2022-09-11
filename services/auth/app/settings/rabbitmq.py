@@ -37,4 +37,3 @@ async def consume(loop) -> RobustConnection:
     await register_methods(rpc)
 
     return connection
-

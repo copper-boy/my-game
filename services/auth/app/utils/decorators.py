@@ -10,4 +10,3 @@ def login_required(target: str, attribute: str) -> callable:
             return await function(*args, **kwargs)
         return wrapped
     return wrapper
-

@@ -38,16 +38,6 @@ async def startup() -> None:
     ensure_future(consume(loop))
 
 
-@app.get('/')
-async def root() -> JSONResponse:
-    u = await register_user(email="admin@admin.com",
-                            password='admin_very_strong_password')
-    await create_admin(u)
-    return JSONResponse(status_code=200,
-                        content={
-                            'ping': 'pong'
-                        })
-
 register_tortoise(app,
                   db_url=get_database_settings().AUTH_DATABASE_URI,
                   modules={

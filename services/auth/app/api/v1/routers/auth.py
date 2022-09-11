@@ -40,20 +40,6 @@ async def login(auth_data: AuthSchema, authorize: AuthJWT = Depends()) -> JSONRe
                         })
 
 
-@router.post('/refresh')
-@login_required(target='authorize', attribute='jwt_required')
-async def refresh(authorize: AuthJWT = Depends()) -> JSONResponse:
-    current_user = authorize.get_jwt_subject()
-    new_access_token = authorize.create_access_token(subject=current_user)
-
-    return JSONResponse(status_code=200,
-                        content={
-                            'detail': {
-                                'access_token': new_access_token
-                            }
-                        })
-
-
 @router.get('/current')
 @login_required(target='authorize', attribute='jwt_required')
 async def current(authorize: AuthJWT = Depends()) -> JSONResponse:
@@ -79,4 +65,3 @@ async def current(authorize: AuthJWT = Depends()) -> JSONResponse:
                                 'admin': admin_pydantic.__dict__
                             }
                         })
-
