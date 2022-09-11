@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
@@ -17,9 +16,6 @@ router = APIRouter()
 async def registration(registration_data: RegistrationSchema) -> JSONResponse:
     user = await register_user(registration_data.email, registration_data.password)
 
-    if user is not None:
-        raise HTTPException(status_code=400,
-                            detail='cannot register new user')
     user_pydantic = await user_pydantic_out.from_tortoise_orm(user)
 
     return JSONResponse(status_code=200,
@@ -63,7 +59,7 @@ async def refresh(authorize: AuthJWT = Depends()) -> JSONResponse:
 async def current(authorize: AuthJWT = Depends()) -> JSONResponse:
     current_user = authorize.get_jwt_subject()
 
-    user_object = await UserModel.get_or_none(email=current_user)
+    user_object = await UserModel.get(email=current_user)
     admin_object = await AdminModel.get_or_none(user=user_object)
 
     user_pydantic = await user_pydantic_out.from_tortoise_orm(user_object)

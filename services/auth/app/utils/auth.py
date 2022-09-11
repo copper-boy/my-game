@@ -55,7 +55,8 @@ async def register_user(email: EmailStr, password: str) -> UserModel | None:
             user = await UserModel.create(email=email,
                                           password=hashed_password)
         else:
-            user = exists_user
+            raise HTTPException(status_code=409,
+                                detail='current user exists')
     except (IncompleteInstanceError, IntegrityError):
         await UserModel.get(email=email).delete()
     else:

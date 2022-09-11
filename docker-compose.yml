@@ -28,8 +28,8 @@ services:
     expose:
       - 8080
     depends_on:
+      - auth_db
       - rabbitmq_service
-
   bot_service:
     image: my-game-bot:latest
     command: python main.py
@@ -41,6 +41,33 @@ services:
       - .telegram.env
     depends_on:
       - rabbitmq_service
+  logic_db:
+    image: postgres:latest
+    volumes:
+      - postgres_data_logic:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${PG_LOGIC_USER}
+      POSTGRES_PASSWORD: ${PG_LOGIC_PASSWORD}
+      POSTGRES_DB: ${PG_LOGIC_DB}
+    expose:
+      - 5432
+  logic_service:
+    image: my-game-logic:latest
+    command: bash -c 'while !</dev/tcp/logic_db/5432; do sleep 1; done; uvicorn main:app --reload --host 0.0.0.0 --port 8081'
+    build: ./services/logic/
+    volumes:
+      - ./services/logic/app/:/app/
+    env_file:
+      - .env
+      - .site.env
+    ports:
+      - '8081:8081'
+    expose:
+      - 8081
+    depends_on:
+      - logic_db
   rabbitmq_service:
     image: rabbitmq:management
     environment:
@@ -57,4 +84,6 @@ services:
 
 volumes:
   postgres_data_auth:
+  postgres_data_logic:
+
   rabbitmq_data:

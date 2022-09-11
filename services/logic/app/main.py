@@ -1,22 +1,11 @@
-from asyncio import ensure_future, get_event_loop
-
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from fastapi_jwt_auth import AuthJWT
 from tortoise.contrib.fastapi import register_tortoise
 
 from api import api_router
-from utils.admin import create_admin
-from utils.auth import register_user
-from settings.config import JWTSettingsSchema, get_database_settings
+from settings.config import get_database_settings
 from settings.handlers import register_all_exception_handlers
 from settings.middlewares import setup_middlewares
-from settings.rabbitmq import consume
-
-
-@AuthJWT.load_config
-def load_config():
-    return JWTSettingsSchema()
 
 
 def create_application() -> FastAPI:
@@ -32,27 +21,18 @@ def create_application() -> FastAPI:
 app = create_application()
 
 
-@app.on_event('startup')
-async def startup() -> None:
-    loop = get_event_loop()
-    ensure_future(consume(loop))
-
-
 @app.get('/')
 async def root() -> JSONResponse:
-    u = await register_user(email="admin@admin.com",
-                            password='admin_very_strong_password')
-    await create_admin(u)
     return JSONResponse(status_code=200,
                         content={
                             'ping': 'pong'
                         })
 
+
 register_tortoise(app,
-                  db_url=get_database_settings().AUTH_DATABASE_URI,
+                  db_url=get_database_settings().LOGIC_DATABASE_URI,
                   modules={
-                      'models': ['orm.user']
+                      'models': ['orm.game', 'orm.session']
                   },
                   generate_schemas=True,
                   add_exception_handlers=True)
-
