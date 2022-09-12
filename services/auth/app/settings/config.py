@@ -13,15 +13,6 @@ def get_admin_settings() -> AdminSettings:
     return AdminSettings()
 
 
-class AMQPSettings(BaseSettings):
-    AMQP_URI: str
-
-
-@lru_cache()
-def get_amqp_settings() -> AMQPSettings:
-    return AMQPSettings()
-
-
 class JWTSettings(BaseSettings):
     JWT_ALGORITHM: str
     JWT_PUBLIC_KEY: str

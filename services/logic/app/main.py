@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from tortoise.contrib.fastapi import register_tortoise
 
-from api import api_router
-from settings.config import get_database_settings
-from settings.handlers import register_all_exception_handlers
-from settings.middlewares import setup_middlewares
+from app.api import api_router
+from app.settings.config import get_database_settings
+from app.settings.handlers import register_all_exception_handlers
+from app.settings.middlewares import setup_middlewares
 
 
 def create_application() -> FastAPI:
@@ -32,7 +32,7 @@ async def root() -> JSONResponse:
 register_tortoise(app,
                   db_url=get_database_settings().LOGIC_DATABASE_URI,
                   modules={
-                      'models': ['orm.game', 'orm.session']
+                      'models': ['app.orm.game', 'app.orm.session']
                   },
                   generate_schemas=True,
                   add_exception_handlers=True)

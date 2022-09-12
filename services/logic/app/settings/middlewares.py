@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse, Response
 
-from settings.config import get_auth_site_settings
+from app.settings.config import get_auth_site_settings
 
 
 async def check_admin_authorization(authorization: str) -> bool:

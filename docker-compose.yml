@@ -15,10 +15,10 @@ services:
       - 5432
   auth_service:
     image: my-game-auth:latest
-    command: bash -c 'while !</dev/tcp/auth_db/5432; do sleep 1; done; uvicorn main:app --reload --host 0.0.0.0 --port 8080'
+    command: bash -c 'while !</dev/tcp/auth_db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0 --port 8956'
     build: ./services/auth/
     volumes:
-      - ./services/auth/app/:/app/
+      - ./services/auth/:/auth/
     env_file:
       - .admin.env
       - .env
@@ -27,13 +27,12 @@ services:
       - 8956
     depends_on:
       - auth_db
-      - rabbitmq_service
   bot_service:
     image: my-game-bot:latest
-    command: python main.py
+    command: python app/main.py
     build: ./services/bot/
     volumes:
-      - ./services/bot/app/:/app/
+      - ./services/bot/:/bot/
     env_file:
       - .env
       - .telegram.env
@@ -53,10 +52,10 @@ services:
       - 5432
   logic_service:
     image: my-game-logic:latest
-    command: bash -c 'while !</dev/tcp/logic_db/5432; do sleep 1; done; uvicorn main:app --reload --host 0.0.0.0 --port 8081'
+    command: bash -c 'while !</dev/tcp/logic_db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0 --port 14961'
     build: ./services/logic/
     volumes:
-      - ./services/logic/app/:/app/
+      - ./services/logic/:/logic/
     env_file:
       - .env
       - .site.env
@@ -79,6 +78,7 @@ services:
       - rabbitmq_data:/data
 
 volumes:
+  postgres_data_test:
   postgres_data_auth:
   postgres_data_logic:
 

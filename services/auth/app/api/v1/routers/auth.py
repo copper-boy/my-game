@@ -3,11 +3,11 @@ from fastapi.param_functions import Depends
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
-from orm.user import (AdminModel, UserModel, admin_pydantic_out,
-                      user_pydantic_out)
-from schemas.auth import AuthSchema, RegistrationSchema
-from utils.auth import authenticate_user, register_user
-from utils.decorators import login_required
+from app.orm.user import (AdminModel, UserModel, admin_pydantic_out,
+                          user_pydantic_out)
+from app.schemas.auth import AuthSchema, RegistrationSchema
+from app.utils.auth import authenticate_user, register_user
+from app.utils.decorators import login_required
 
 router = APIRouter()
 

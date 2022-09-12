@@ -1,6 +1,6 @@
 from tortoise.queryset import QuerySet
 
-from orm.game import AnswerModel, GameModel, QuestionModel, ThemeModel
+from app.orm.game import AnswerModel, GameModel, QuestionModel, ThemeModel
 
 
 async def create_answer(correct: str,

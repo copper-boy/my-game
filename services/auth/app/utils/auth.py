@@ -3,8 +3,8 @@ from passlib.context import CryptContext
 from pydantic import EmailStr
 from tortoise.exceptions import IncompleteInstanceError, IntegrityError
 
-from orm.user import UserModel
-from schemas.auth import AuthSchema
+from app.orm.user import UserModel
+from app.schemas.auth import AuthSchema
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -58,6 +58,14 @@ async def register_user(email: EmailStr, password: str) -> UserModel | None:
             raise HTTPException(status_code=409,
                                 detail='current user exists')
     except (IncompleteInstanceError, IntegrityError):
-        await UserModel.get(email=email).delete()
+        user = await UserModel.get(email=email)
+        await user.delete()
     else:
         return user
+
+
+async def delete_user(email: EmailStr) -> None:
+    user = await UserModel.get_or_none(email=email)
+
+    if user is not None:
+        await user.delete()

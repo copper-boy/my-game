@@ -1,5 +1,5 @@
-from orm.game import GameModel
-from orm.session import ChatModel, PlayerModel, SessionModel
+from app.orm.game import GameModel
+from app.orm.session import ChatModel, PlayerModel, SessionModel
 
 
 async def create_session(game: GameModel) -> SessionModel:
