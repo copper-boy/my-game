@@ -63,7 +63,7 @@ services:
       - 14961
     depends_on:
       - logic_db
-  rabbitmq_service:
+  rabbit:
     image: rabbitmq:management
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
