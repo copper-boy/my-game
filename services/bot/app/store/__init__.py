@@ -1,4 +1,4 @@
-from settings.config import get_telegram_bot_settings
+from app.settings.config import get_telegram_bot_settings
 
 
 class Store:

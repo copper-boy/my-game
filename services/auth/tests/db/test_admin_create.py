@@ -1,7 +1,6 @@
 from logging import getLogger
 
 import pytest
-from tortoise.exceptions import IntegrityError
 
 from app.utils.admin import create_admin
 

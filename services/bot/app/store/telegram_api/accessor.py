@@ -1,6 +1,6 @@
 from aiohttp.client import ClientSession
 
-from base.base_accessor import BaseAccessor
+from app.base.base_accessor import BaseAccessor
 
 API_PATH = 'https://api.telegram.org'
 

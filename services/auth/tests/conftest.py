@@ -1,9 +1,9 @@
 import pytest
+from aiohttp.test_utils import loop_context
 from fastapi import FastAPI, HTTPException
 from httpx import AsyncClient
 from tortoise import Tortoise
 
-from aiohttp.test_utils import loop_context
 from app.main import app
 from app.schemas.auth import AuthSchema
 from app.settings.config import get_admin_settings

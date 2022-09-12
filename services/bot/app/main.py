@@ -2,8 +2,8 @@ from asyncio import get_event_loop, run
 from datetime import datetime
 from logging import getLogger
 
-from rabbit import get_rabbit_connection, send
-from store import Store
+from app.rabbit import get_rabbit_connection, send
+from app.store import Store
 
 logger = getLogger(__name__)
 

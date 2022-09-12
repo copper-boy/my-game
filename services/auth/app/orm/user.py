@@ -1,7 +1,7 @@
 from tortoise import Model
 from tortoise.contrib.pydantic import pydantic_model_creator
 from tortoise.fields.data import BigIntField, CharField
-from tortoise.fields.relational import OneToOneRelation, OneToOneField
+from tortoise.fields.relational import OneToOneField, OneToOneRelation
 
 
 class UserModel(Model):

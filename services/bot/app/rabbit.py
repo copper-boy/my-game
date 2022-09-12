@@ -1,8 +1,7 @@
+from aio_pika import Connection, Message, connect
 from asyncio import sleep
 from json import dumps
 from logging import getLogger
-
-from aio_pika import Connection, Message, connect
 
 from settings.config import get_amqp_settings
 

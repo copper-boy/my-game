@@ -7,8 +7,9 @@ from app.orm.game import (answer_pydantic_in, answer_pydantic_out,
                           question_pydantic_in, question_pydantic_out,
                           theme_pydantic_in, theme_pydantic_out)
 from app.utils.game import (create_answer, create_game, create_question,
-                            create_theme, get_answer_by_question, get_game_by_id,
-                            get_game_list, get_question_by_id, get_theme_by_id)
+                            create_theme, get_answer_by_question,
+                            get_game_by_id, get_game_list, get_question_by_id,
+                            get_theme_by_id)
 
 router = APIRouter()
 

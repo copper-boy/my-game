@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestRegistration:
     async def test_bad_registration(self, cli):
         resp = await cli.post(url='/api/v1/auth/registration',
