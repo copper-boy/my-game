@@ -1,8 +1,7 @@
-from asyncio import get_event_loop, run
+from asyncio import run
 from datetime import datetime
 from logging import getLogger
 
-from app.rabbit import get_rabbit_connection, send
 from app.store import Store
 
 logger = getLogger(__name__)
@@ -10,9 +9,7 @@ logger = getLogger(__name__)
 
 async def main() -> None:
     store = Store()
-
-    loop = get_event_loop()
-    connection = await get_rabbit_connection(loop)
+    await store.setup()
 
     logger.info(f'telegram bot started at {datetime.now()}')
     offset = 0
@@ -21,7 +18,7 @@ async def main() -> None:
             updates = await store.telegram_api.poll(offset)
             for update in updates:
                 offset = update['update_id'] + 1
-            await send(connection=connection, message=updates)
+            await store.botq.send(updates)
         except Exception:
             logger.info(f'telegram bot stopped at {datetime.now()}')
 
