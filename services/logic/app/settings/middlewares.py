@@ -19,7 +19,7 @@ async def check_admin_authorization(authorization: str) -> bool:
     except (ClientResponseError, TypeError):
         return False
 
-    return json['detail'].get('admin', None) is not None
+    return json['detail']['is_admin']
 
 
 async def admin_middleware(request: Request, call_next: Callable) -> Response:

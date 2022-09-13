@@ -37,7 +37,7 @@ services:
       - .env
       - .telegram.env
     depends_on:
-      - rabbitmq_service
+      - rabbit
   logic_db:
     image: postgres:latest
     volumes:

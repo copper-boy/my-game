@@ -19,40 +19,38 @@ router = APIRouter()
 async def post_session(game_id: int = Query(...)) -> session_pydantic_out:
     game = await get_game_by_id(game_id)
     session = await create_session(game)
+    session_pydantic = await session_pydantic_out.from_tortoise_orm(session)
 
-    return session
+    return session_pydantic
 
 
 @router.post('/create/chat')
-async def post_chat(chat_id: int = Query(...),
-                    session_id: int = Query(...)) -> chat_pydantic_out:
+async def post_chat(chat_id: int = Query(...), session_id: int = Query(...)) -> chat_pydantic_out:
     session = await get_session_by_id(session_id)
 
     if await get_chat_by_telegram_chat_id(id=chat_id):
         raise HTTPException(status_code=409,
                             detail='chat already exits')
 
-    chat = await create_chat(chat_id=chat_id,
-                             session=session)
+    chat = await create_chat(chat_id=chat_id, session=session)
+    chat_pydantic = await chat_pydantic_out.from_tortoise_orm(chat)
 
-    return chat
+    return chat_pydantic
 
 
 @router.post('/create/player')
-async def post_player(chat_id: int = Query(...),
-                      player_id: int = Query(...)) -> player_pydantic_out:
+async def post_player(chat_id: int = Query(...), player_id: int = Query(...)) -> player_pydantic_out:
     chat = await get_chat_by_telegram_chat_id(id=chat_id)
     session = await get_session_by_chat(chat=chat.id)
 
-    if await get_player_by_session(player_id=player_id,
-                                   session=session):
+    if await get_player_by_session(player_id=player_id, session=session):
         raise HTTPException(status_code=409,
                             detail='player already exists')
 
-    player = await create_player(player_id=player_id,
-                                 session=session)
+    player = await create_player(player_id=player_id, session=session)
+    player_pydantic = await player_pydantic_out.from_tortoise_orm(player)
 
-    return player
+    return player_pydantic
 
 
 @router.delete('/delete/session')
@@ -70,8 +68,7 @@ async def delete_session(session_id: int = Query(...)) -> JSONResponse:
 
 
 @router.delete('/delete/player')
-async def delete_player(player_id: int = Query(...),
-                        chat_id: int = Query(...)) -> JSONResponse:
+async def delete_player(player_id: int = Query(...), chat_id: int = Query(...)) -> JSONResponse:
     try:
         await remove_player(player_id,
                             chat_id)
@@ -88,36 +85,37 @@ async def delete_player(player_id: int = Query(...),
 @router.get('/get/chat')
 async def get_chat(chat_id: int = Query(...)) -> chat_pydantic_out:
     chat = await get_chat_by_telegram_chat_id(chat_id)
+    chat_pydantic = await chat_pydantic_out.from_tortoise_orm(chat)
 
-    return chat
+    return chat_pydantic
 
 
 @router.get('/get/session')
 async def get_session(chat_id: int = Query(...)) -> session_pydantic_out:
     chat = await get_chat_by_telegram_chat_id(id=chat_id)
     session = await get_session_by_chat(chat=chat.id)
+    session_pydantic = await session_pydantic_out.from_tortoise_orm(session)
 
-    return session
+    return session_pydantic
 
 
 @router.get('/get/players')
 async def get_players(chat_id: int = Query(...)) -> list[player_pydantic_out]:
     chat = await get_chat_by_telegram_chat_id(id=chat_id)
     session = await get_session_by_chat(chat=chat.id)
-    raw_players = [player async for player in session.players]
+    players_pydantic = [await player_pydantic_out.from_tortoise_orm(player) async for player in session.players]
 
-    return raw_players
+    return players_pydantic
 
 
 @router.get('/get/player')
-async def get_player(chat_id: int = Query(...),
-                     player_id: int = Query(...)) -> player_pydantic_out:
-    chat = await get_chat_by_telegram_chat_id(chat_id=chat_id)
+async def get_player(chat_id: int = Query(...), player_id: int = Query(...)) -> player_pydantic_out:
+    chat = await get_chat_by_telegram_chat_id(id=chat_id)
     session = await get_session_by_chat(chat=chat)
-    player = await get_player_by_session(player_id=player_id,
-                                         session=session)
+    player = await get_player_by_session(player_id=player_id, session=session)
+    player_pydantic = await player_pydantic_out.from_tortoise_orm(player)
 
-    return player
+    return player_pydantic
 
 
 @router.put('/update/player/pot')
@@ -131,5 +129,6 @@ async def put_player_pot(chat_id: int = Query(...),
 
     await update_player_pot(player=player,
                             pot=pot)
+    player_pydantic = await player_pydantic_out.from_tortoise_orm(player)
 
-    return player
+    return player_pydantic
