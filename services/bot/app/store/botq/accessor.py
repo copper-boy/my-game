@@ -37,5 +37,5 @@ class BotQAccessor(BaseAccessor):
             message=Message(dumps(message).encode('utf-8')),
             routing_key=self.queue.name
         )
-        self.logger.warning(f'successfully sent {message=}')
+        self.logger.info(f'successfully sent {message=}')
 
