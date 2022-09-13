@@ -6,7 +6,7 @@ from tortoise.exceptions import DoesNotExist
 from app.schemas.auth import AuthSchema
 from app.utils.auth import authenticate_user, delete_user, register_user
 
-logger = getLogger('admin_tests')
+logger = getLogger('auth')
 
 
 class TestUserCreate:
@@ -27,6 +27,6 @@ class TestUserAuth:
 
     async def test_db_bad_login(self, config):
         with pytest.raises(DoesNotExist) as e_info:
-            _unused = await authenticate_user(AuthSchema(email='not-found@email.com',
-                                                         password='invalid_password_posted'))
+            await authenticate_user(AuthSchema(email='not-found@email.com',
+                                               password='invalid_password_posted'))
             logger.exception(e_info)

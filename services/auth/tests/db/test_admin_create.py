@@ -2,14 +2,23 @@ from logging import getLogger
 
 import pytest
 
-from app.utils.admin import create_admin
+from app.utils.user import (get_user_by_email, register_admin,
+                            update_user_to_admin)
 
-logger = getLogger('admin_tests')
+logger = getLogger('admin')
 
 
 @pytest.mark.usefixtures('anyio_backend')
 class TestAdminCreate:
     async def test_successfully_create(self, default_user, config):
-        admin = await create_admin(default_user)
+        await update_user_to_admin(default_user)
 
-        assert await admin[0].user.filter(adminmodel=admin[0].id).count() == 1
+        assert default_user.is_admin
+
+    async def test_register_admin(self, config):
+        await register_admin()
+        user = await get_user_by_email(email=config.ADMIN_LOGIN)
+
+        assert user.is_admin
+
+
