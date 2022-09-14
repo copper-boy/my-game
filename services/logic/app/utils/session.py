@@ -1,9 +1,8 @@
-from app.orm.game import GameModel
-from app.orm.session import ChatModel, PlayerModel, SessionModel
+from app.orm.session import PlayerModel, SessionModel
 
 
-async def create_session(game: GameModel) -> SessionModel:
-    session = await SessionModel.create(game=game)
+async def create_session(game_id: int, chat_id: int) -> SessionModel:
+    session = await SessionModel.create(game_id=game_id, chat_id=chat_id)
     return session
 
 
@@ -17,21 +16,9 @@ async def get_session_by_id(id: int) -> SessionModel:
     return session
 
 
-async def get_session_by_chat(chat: ChatModel) -> SessionModel:
-    session = await SessionModel.get(chat=chat)
+async def get_session_by_chat_id(chat_id: int) -> SessionModel:
+    session = await SessionModel.get(chat_id=chat_id)
     return session
-
-
-async def create_chat(chat_id: int,
-                      session: SessionModel) -> ChatModel:
-    chat = await ChatModel.create(chat_id=chat_id,
-                                  session=session)
-    return chat
-
-
-async def get_chat_by_telegram_chat_id(id: int) -> ChatModel:
-    chat = await ChatModel.get(chat_id=id)
-    return chat
 
 
 async def create_player(player_id: int,
@@ -45,7 +32,7 @@ async def create_player(player_id: int,
 
 async def remove_player(player_id: int,
                         chat_id: int) -> None:
-    session = await get_session_by_chat(chat_id)
+    session = await get_session_by_chat_id(chat_id)
 
     player = await session.players.filter(player_id=player_id).first()
 
@@ -54,14 +41,16 @@ async def remove_player(player_id: int,
 
 async def get_player_by_session(player_id: int,
                                 session: SessionModel) -> PlayerModel:
-    player = await PlayerModel.get(player_id=player_id,
-                                   session=session)
+    player = await PlayerModel.get_or_none(player_id=player_id,
+                                           session=session)
     return player
 
 
-async def update_player_pot(player: PlayerModel,
-                            pot: int) -> None:
-    await player.update_from_dict({
-        'pot': player.pot + pot
-    })
+async def update_player(player: PlayerModel, params: dict) -> None:
+    await player.update_from_dict(params)
     await player.save()
+
+
+async def update_session(session: SessionModel, params: dict) -> None:
+    await session.update_from_dict(params)
+    await session.save()

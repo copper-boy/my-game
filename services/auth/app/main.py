@@ -26,13 +26,10 @@ def create_application() -> FastAPI:
 app = create_application()
 
 
-@app.on_event('startup')
-async def startup() -> None:
-    await register_admin()
-
-
 @app.get('/')
 async def root() -> JSONResponse:
+    await register_admin()
+
     return JSONResponse(status_code=200,
                         content={
                             'ping': 'pong'

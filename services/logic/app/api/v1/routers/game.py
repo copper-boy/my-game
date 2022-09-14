@@ -8,7 +8,7 @@ from app.orm.game import (answer_pydantic_in, answer_pydantic_out,
                           theme_pydantic_in, theme_pydantic_out)
 from app.utils.game import (create_answer, create_game, create_question,
                             create_theme, get_answer_by_question,
-                            get_game_by_id, get_game_list, get_question_by_id,
+                            get_game_by_id, get_game_by_name, get_game_list, get_question_by_id,
                             get_theme_by_id)
 
 router = APIRouter()
@@ -29,6 +29,10 @@ async def post_answer(data: answer_pydantic_in, question_id: int = Query(...)) -
 
 @router.post('/create/game')
 async def post_game(data: game_pydantic_in) -> game_pydantic_out:
+    if await get_game_by_name(data.name):
+        raise HTTPException(status_code=409,
+                            detail='game already exists')
+
     game = await create_game(**data.dict())
     game_pydantic = await game_pydantic_out.from_tortoise_orm(game)
 
@@ -52,9 +56,6 @@ async def post_theme(data: theme_pydantic_in, game_id: int = Query(...)) -> them
 @router.post('/create/question')
 async def post_question(data: question_pydantic_in, theme_id: int = Query(...)) -> question_pydantic_out:
     theme = await get_theme_by_id(theme_id)
-    if await theme.questions.filter(theme=theme).first():
-        raise HTTPException(status_code=409,
-                            detail='question already exists')
 
     question = await create_question(**data.dict(), theme=theme)
     question_pydantic = await question_pydantic_out.from_tortoise_orm(question)
@@ -62,8 +63,28 @@ async def post_question(data: question_pydantic_in, theme_id: int = Query(...)) 
     return question_pydantic
 
 
+@router.get('/get/game/by-name')
+async def get_game_name(game_name: str = Query(...)) -> game_pydantic_out:
+    game = await get_game_by_name(game_name)
+    if game is None:
+        raise HTTPException(status_code=404,
+                            detail='game not found')
+
+    game_pydantic = await game_pydantic_out.from_tortoise_orm(game)
+
+    return game_pydantic
+
+
+@router.get('/get/game/by-id')
+async def get_game_id(game_id: int = Query(...)) -> game_pydantic_out:
+    game = await get_game_by_id(game_id)
+    game_pydantic = await game_pydantic_out.from_tortoise_orm(game)
+
+    return game_pydantic
+
+
 @router.get('/get/games')
-async def game_list() -> list[game_pydantic_out]:
+async def list_game() -> list[game_pydantic_out]:
     games = await get_game_list()
     games_pydantic: list[game_pydantic_out] = [await game_pydantic_out.from_tortoise_orm(game) async for game in games]
 
@@ -80,8 +101,12 @@ async def list_theme(game_id: int = Query(...)) -> list[theme_pydantic_out]:
 
 
 @router.get('/get/questions')
-async def list_questions(theme_id: int = Query(...)) -> list[question_pydantic_out]:
+async def list_question(theme_id: int = Query(...)) -> list[question_pydantic_out]:
     theme = await get_theme_by_id(theme_id)
+    if theme is None:
+        raise HTTPException(status_code=404,
+                            detail='theme not found')
+
     questions_pydantic: list[question_pydantic_out] = [await question_pydantic_out.from_tortoise_orm(question) async for
                                                        question in theme.questions]
 

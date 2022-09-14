@@ -49,7 +49,7 @@ class QuestionModel(Model):
 
     theme: ForeignKeyRelation['ThemeModel'] = ForeignKeyField(model_name='models.ThemeModel',
                                                               related_name='questions')
-    answer: OneToOneRelation
+    answer: ForeignKeyRelation
 
 
 question_pydantic_in = pydantic_model_creator(QuestionModel,
@@ -65,8 +65,8 @@ class AnswerModel(Model):
 
     correct = TextField()
 
-    question: OneToOneRelation['QuestionModel'] = OneToOneField(model_name='models.AnswerModel',
-                                                                related_name='answer')
+    question: ForeignKeyRelation['QuestionModel'] = ForeignKeyField(model_name='models.AnswerModel',
+                                                                    related_name='answer')
 
 
 answer_pydantic_in = pydantic_model_creator(AnswerModel,

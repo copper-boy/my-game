@@ -14,9 +14,7 @@ def get_admin_settings() -> AdminSettings:
 
 
 class JWTSettings(BaseSettings):
-    JWT_ALGORITHM: str
-    JWT_PUBLIC_KEY: str
-    JWT_PRIVATE_KEY: str
+    JWT_SECRET_KEY: str
 
 
 @lru_cache()
@@ -34,6 +32,4 @@ def get_database_settings() -> DatabaseSettings:
 
 
 class JWTSettingsSchema(BaseModel):
-    authjwt_algorithm: str = get_jwt_settings().JWT_ALGORITHM
-    authjwt_public_key: str = get_jwt_settings().JWT_PUBLIC_KEY
-    authjwt_private_key: str = get_jwt_settings().JWT_PRIVATE_KEY
+    authjwt_secret_key: str = get_jwt_settings().JWT_SECRET_KEY

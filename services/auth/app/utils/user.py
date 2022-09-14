@@ -37,11 +37,11 @@ async def __setup_admin() -> None:
 
 
 async def register_admin() -> None:
-    while True:
-        try:
-            await __setup_admin()
-        except TypeError:
-            logger.info('wait for tortoise setup')
-            await sleep(1)
-        else:
-            break
+    config = get_admin_settings()
+    try:
+        user = await register_user(config.ADMIN_LOGIN,
+                                   config.ADMIN_PASSWORD)
+    except HTTPException:
+        user = await authenticate_user(AuthSchema(email=config.ADMIN_LOGIN,
+                                                  password=config.ADMIN_PASSWORD))
+    await update_user_to_admin(user)

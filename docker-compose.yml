@@ -13,6 +13,7 @@ services:
       POSTGRES_DB: ${PG_AUTH_DB}
     expose:
       - 5432
+    restart: on-failure
   auth_service:
     image: my-game-auth:latest
     command: bash -c 'while !</dev/tcp/auth_db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0 --port 8956'
@@ -23,10 +24,11 @@ services:
       - .admin.env
       - .env
       - .keys.env
-    expose:
-      - 8956
+    ports:
+      - '8956:8956'
     depends_on:
       - auth_db
+    restart: on-failure
   bot_service:
     image: my-game-bot:latest
     command: python app/main.py
@@ -38,6 +40,7 @@ services:
       - .telegram.env
     depends_on:
       - rabbit
+    restart: on-failure
   logic_db:
     image: postgres:latest
     volumes:
@@ -50,6 +53,7 @@ services:
       POSTGRES_DB: ${PG_LOGIC_DB}
     expose:
       - 5432
+    restart: on-failure
   logic_service:
     image: my-game-logic:latest
     command: bash -c 'while !</dev/tcp/logic_db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0 --port 14961'
@@ -59,10 +63,24 @@ services:
     env_file:
       - .env
       - .site.env
-    expose:
-      - 14961
+    ports:
+      - '14961:14961'
     depends_on:
+      - auth_service
       - logic_db
+    restart: on-failure
+  handler_service:
+    image: my-game-handler:latest
+    command: python app/main.py
+    build: ./services/handler
+    volumes:
+      - ./services/handler/:/handler
+    env_file:
+      - .admin.env
+      - .env
+    depends_on:
+      - logic_service
+    restart: on-failure
   rabbit:
     image: rabbitmq:management
     environment:
