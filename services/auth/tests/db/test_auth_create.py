@@ -1,10 +1,9 @@
 from logging import getLogger
 
 import pytest
-from tortoise.exceptions import DoesNotExist
-
 from app.schemas.auth import AuthSchema
 from app.utils.auth import authenticate_user, delete_user, register_user
+from tortoise.exceptions import DoesNotExist
 
 logger = getLogger('auth')
 
