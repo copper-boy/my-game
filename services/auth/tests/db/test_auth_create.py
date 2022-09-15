@@ -10,22 +10,22 @@ logger = getLogger('auth')
 
 
 class TestUserCreate:
-    async def test_successfully_create(self, config):
-        await delete_user(config.ADMIN_LOGIN)
+    async def test_successfully_create(self):
+        await delete_user('some@email.com')
 
-        user = await register_user(config.ADMIN_LOGIN, config.ADMIN_PASSWORD)
+        user = await register_user('some@email.com', 'very_strong_password')
 
-        assert user.email == config.ADMIN_LOGIN
+        assert user.email == 'some@email.com'
 
 
 class TestUserAuth:
-    async def test_db_successfully_auth(self, config):
-        user = await authenticate_user(AuthSchema(email=config.ADMIN_LOGIN,
-                                                  password=config.ADMIN_PASSWORD))
+    async def test_db_successfully_auth(self):
+        user = await authenticate_user(AuthSchema(email='some@email.com',
+                                                  password='very_strong_password'))
 
-        assert user.email == config.ADMIN_LOGIN
+        assert user.email == 'some@email.com'
 
-    async def test_db_bad_login(self, config):
+    async def test_db_bad_login(self):
         with pytest.raises(DoesNotExist) as e_info:
             await authenticate_user(AuthSchema(email='not-found@email.com',
                                                password='invalid_password_posted'))

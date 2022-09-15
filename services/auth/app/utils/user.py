@@ -1,13 +1,9 @@
-from asyncio import sleep
 from logging import getLogger
 
-from fastapi.exceptions import HTTPException
 from pydantic import EmailStr
 
 from app.orm.user import UserModel
-from app.schemas.auth import AuthSchema
-from app.settings.config import get_admin_settings
-from app.utils.auth import authenticate_user, register_user
+from app.settings.config import get_admin_infinity_token_settings
 
 logger = getLogger('user')
 
@@ -25,23 +21,7 @@ async def update_user_to_admin(user: UserModel) -> None:
     await user.save()
 
 
-async def __setup_admin() -> None:
-    config = get_admin_settings()
-    try:
-        user = await register_user(config.ADMIN_LOGIN,
-                                   config.ADMIN_PASSWORD)
-    except HTTPException:
-        user = await authenticate_user(AuthSchema(email=config.ADMIN_LOGIN,
-                                                  password=config.ADMIN_PASSWORD))
-    await update_user_to_admin(user)
+async def verify_admin(token: str) -> bool:
+    config = get_admin_infinity_token_settings()
 
-
-async def register_admin() -> None:
-    config = get_admin_settings()
-    try:
-        user = await register_user(config.ADMIN_LOGIN,
-                                   config.ADMIN_PASSWORD)
-    except HTTPException:
-        user = await authenticate_user(AuthSchema(email=config.ADMIN_LOGIN,
-                                                  password=config.ADMIN_PASSWORD))
-    await update_user_to_admin(user)
+    return token == config.INFINITY_ADMIN_TOKEN

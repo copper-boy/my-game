@@ -6,7 +6,6 @@ from tortoise.contrib.fastapi import register_tortoise
 from app.api import api_router
 from app.settings.config import JWTSettingsSchema, get_database_settings
 from app.settings.handlers import register_all_exception_handlers
-from app.utils.user import register_admin
 
 
 @AuthJWT.load_config
@@ -28,8 +27,6 @@ app = create_application()
 
 @app.get('/')
 async def root() -> JSONResponse:
-    await register_admin()
-
     return JSONResponse(status_code=200,
                         content={
                             'ping': 'pong'

@@ -6,7 +6,6 @@ from tortoise import Tortoise
 
 from app.main import app
 from app.schemas.auth import AuthSchema
-from app.settings.config import get_admin_settings
 from app.utils.auth import authenticate_user, register_user
 
 AUTH_SITE_URL = 'http://auth_service:8956'
@@ -52,22 +51,17 @@ def server() -> FastAPI:
 
 
 @pytest.fixture(scope='session')
-def config():
-    yield get_admin_settings()
-
-
-@pytest.fixture(scope='session')
 async def cli(server):
     async with AsyncClient(app=app, base_url=AUTH_SITE_URL) as client:
         yield client
 
 
 @pytest.fixture(scope='session')
-async def authed_cli(cli, config):
+async def authed_cli(cli, default_user):
     resp = await cli.post(url='/api/v1/auth/login',
                           json={
-                              'email': config.ADMIN_LOGIN,
-                              'password': config.ADMIN_PASSWORD
+                              'email': 'some@email.com',
+                              'password': 'very_strong_password'
                           })
     resp_json = resp.json()
     cli.headers['Authorization'] = f'Bearer {resp_json["detail"]["access_token"]}'
@@ -76,10 +70,10 @@ async def authed_cli(cli, config):
 
 
 @pytest.fixture(scope='session')
-async def default_user(config):
+async def default_user():
     try:
-        user = await register_user(config.ADMIN_LOGIN, config.ADMIN_LOGIN)
+        user = await register_user('some@email.com', 'very_strong_password')
     except HTTPException:
-        user = await authenticate_user(AuthSchema(email=config.ADMIN_LOGIN,
-                                                  password=config.ADMIN_PASSWORD))
+        user = await authenticate_user(AuthSchema(email='some@email.com',
+                                                  password='very_strong_password'))
     yield user
