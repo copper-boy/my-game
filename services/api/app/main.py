@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.param_functions import Query, Header
 from fastapi.responses import JSONResponse
 from tortoise.contrib.fastapi import register_tortoise
 
@@ -9,8 +10,10 @@ from app.settings.middlewares import setup_middlewares
 
 
 def create_application() -> FastAPI:
-    application = FastAPI()
-    application.include_router(api_router, prefix='/api')
+    application = FastAPI(openapi_url='/api/openapi.json',
+                          docs_url='/api/docs',
+                          redoc_url='/api/redoc')
+    application.include_router(api_router, prefix='/api', tags=['API'])
 
     register_all_exception_handlers(application)
     setup_middlewares(application)
@@ -22,7 +25,7 @@ app = create_application()
 
 
 @app.get('/')
-async def root() -> JSONResponse:
+async def root(token: str = Query(...)) -> JSONResponse:
     return JSONResponse(status_code=200,
                         content={
                             'ping': 'pong'
@@ -30,9 +33,9 @@ async def root() -> JSONResponse:
 
 
 register_tortoise(app,
-                  db_url=get_database_settings().LOGIC_DATABASE_URI,
+                  db_url=get_database_settings().API_DATABASE_URI,
                   modules={
-                      'models': ['app.orm.game', 'app.orm.session']
+                      'models': ['app.orm.game']
                   },
                   generate_schemas=True,
                   add_exception_handlers=True)

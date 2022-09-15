@@ -14,17 +14,12 @@ async def get_answer_by_question(question: QuestionModel) -> AnswerModel:
 
 
 async def create_game(name: str) -> GameModel:
-    game = await GameModel.create(name=name.lower())
+    game = await GameModel.create(name=name)
     return game
 
 
 async def get_game_by_id(id: int) -> GameModel:
     game = await GameModel.get_or_none(id=id)
-    return game
-
-
-async def get_game_by_name(name: str) -> GameModel:
-    game = await GameModel.get_or_none(name=name.lower())
     return game
 
 

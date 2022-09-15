@@ -78,7 +78,7 @@ async def update_permissions(token: str = Query(...), email: str = Path(...)) ->
                         })
 
 
-@router.post('/admin')
+@router.get('/admin')
 async def admin(token: str = Query(...)) -> JSONResponse:
     if not await verify_admin(token=token):
         raise HTTPException(status_code=403,

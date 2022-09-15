@@ -13,7 +13,7 @@ def get_auth_site_settings() -> AuthSiteSettings:
 
 
 class DatabaseSettings(BaseSettings):
-    LOGIC_DATABASE_URI: str
+    API_DATABASE_URI: str
 
 
 @lru_cache()

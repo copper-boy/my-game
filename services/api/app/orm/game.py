@@ -1,9 +1,7 @@
 from tortoise import Model
 from tortoise.contrib.pydantic import pydantic_model_creator
 from tortoise.fields.data import BigIntField, CharField, IntField, TextField
-from tortoise.fields.relational import (ForeignKeyField, ForeignKeyRelation,
-                                        OneToOneField, OneToOneRelation,
-                                        ReverseRelation)
+from tortoise.fields.relational import (ForeignKeyField, ForeignKeyRelation, ReverseRelation)
 
 
 class GameModel(Model):
@@ -11,7 +9,6 @@ class GameModel(Model):
 
     name = CharField(max_length=200, unique=True)
 
-    session: OneToOneRelation
     themes: ReverseRelation
 
 
@@ -42,7 +39,7 @@ theme_pydantic_out = pydantic_model_creator(ThemeModel,
 
 
 class QuestionModel(Model):
-    id = BigIntField(pk=True, index=True)
+    id = BigIntField(pk=True)
 
     title = CharField(max_length=200, unique=True)
     cost = IntField(default=0)
@@ -61,7 +58,7 @@ question_pydantic_out = pydantic_model_creator(QuestionModel,
 
 
 class AnswerModel(Model):
-    id = BigIntField(pk=True, index=True)
+    id = BigIntField(pk=True)
 
     correct = TextField()
 
