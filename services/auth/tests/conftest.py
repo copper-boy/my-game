@@ -1,11 +1,12 @@
 import pytest
 from aiohttp.test_utils import loop_context
-from app.main import app
-from app.schemas.auth import AuthSchema
-from app.utils.auth import authenticate_user, register_user
 from fastapi import FastAPI, HTTPException
 from httpx import AsyncClient
 from tortoise import Tortoise
+
+from app.main import app
+from app.schemas.auth import AuthSchema
+from app.utils.auth import authenticate_user, register_user
 
 AUTH_SITE_URL = 'http://auth_service:8956'
 DB_URI = 'sqlite://:memory:'

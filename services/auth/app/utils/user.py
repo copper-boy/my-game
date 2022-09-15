@@ -1,8 +1,9 @@
 from logging import getLogger
 
+from pydantic import EmailStr
+
 from app.orm.user import UserModel
 from app.settings.config import get_admin_infinity_token_settings
-from pydantic import EmailStr
 
 logger = getLogger('user')
 

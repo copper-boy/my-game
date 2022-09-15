@@ -1,9 +1,10 @@
-from app.orm.user import UserModel
-from app.schemas.auth import AuthSchema
 from fastapi.exceptions import HTTPException
 from passlib.context import CryptContext
 from pydantic import EmailStr
 from tortoise.exceptions import IncompleteInstanceError, IntegrityError
+
+from app.orm.user import UserModel
+from app.schemas.auth import AuthSchema
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 

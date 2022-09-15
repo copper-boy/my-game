@@ -1,10 +1,11 @@
-from app.api import api_router
-from app.settings.config import JWTSettingsSchema, get_database_settings
-from app.settings.handlers import register_all_exception_handlers
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from tortoise.contrib.fastapi import register_tortoise
+
+from app.api import api_router
+from app.settings.config import JWTSettingsSchema, get_database_settings
+from app.settings.handlers import register_all_exception_handlers
 
 
 @AuthJWT.load_config
