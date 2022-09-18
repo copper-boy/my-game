@@ -1,15 +1,17 @@
-from typing import TYPE_CHECKING
+from app.schemas.message import CallbackSchema, MessageSchema
 
-from app.schemas.message import MessageSuperGroupSchema
+BAD_MESSAGE_COMMAND_TEXT = """
+I have not support this command yet!
+"""
 
-if TYPE_CHECKING:
-    from app.bot import Bot
-
-BAD_MESSAGE_TEXT = """
-I have not support commands in this chat yet!
+BAD_MESSAGE_CALLBACK_TEXT = """
+I have not support this button yet.
 """
 
 
-async def bad_message_handler(bot: 'Bot', chat_id: int | None = None,
-                              message: MessageSuperGroupSchema | None = None) -> None:
-    await bot.send_message(message=BAD_MESSAGE_TEXT, chat_id=message.chat.id if message else chat_id)
+async def bad_message_command_handler(bot, message: MessageSchema) -> None:
+    await bot.send_message(message=BAD_MESSAGE_COMMAND_TEXT, chat_id=message.chat.id)
+
+
+async def bad_message_callback_handler(bot, callback: CallbackSchema) -> None:
+    await bot.send_message(message=BAD_MESSAGE_CALLBACK_TEXT, chat_id=callback.message.chat.id)

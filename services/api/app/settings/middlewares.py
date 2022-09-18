@@ -40,7 +40,7 @@ async def admin_middleware(request: Request, call_next: Callable) -> Response:
         '/api/openapi.json',
         '/api/docs',
         '/api/redoc',
-        '/favico.ico'
+        '/favicon.ico'
     }:
         response = await call_next(request)
         return response

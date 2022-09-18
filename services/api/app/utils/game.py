@@ -23,9 +23,27 @@ async def get_game_by_id(id: int) -> GameModel:
     return game
 
 
-async def get_game_list() -> QuerySet[GameModel]:
-    games = GameModel.all()
+async def get_game_by_name(name: str) -> GameModel:
+    game = await GameModel.get_or_none(name=name)
+    return game
+
+
+async def get_games_count() -> int:
+    return GameModel.all().count()
+
+
+async def get_games_list(offset: int) -> QuerySet[GameModel]:
+    games = await GameModel.all().offset(offset)
     return games
+
+
+async def get_themes_count(game: GameModel) -> ThemeModel:
+    return await ThemeModel.filter(game=game).count()
+
+
+async def get_themes_list(game: GameModel, offset: int) -> QuerySet[ThemeModel]:
+    themes = await ThemeModel.filter(game=game).offset(offset)
+    return themes
 
 
 async def create_theme(title: str, game: GameModel) -> ThemeModel:

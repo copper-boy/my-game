@@ -1,21 +1,24 @@
-from aiohttp import ClientSession
-from app.authed_client import set_auth_session
+from aiohttp.client import ClientSession
 
-GAMES_TEXT = """
-Available games:
-
-{}
-"""
+from app.integration.api import get_games
+from app.settings.config import get_api_site_settings
 
 
-async def games_command_handler(bot, message):
-    async with ClientSession() as session:
-        await set_auth_session(session)
+async def games_command_handler(bot, message) -> None:
+    async with ClientSession(base_url=get_api_site_settings().API_SITE_BASE_URL) as client:
+        games_json = await get_games(client=client)
 
-        async with session.get(url='http://logic_service:14961/api/v1/logic/get/games') as response:
-            json = await response.json()
-    game_names = '\n'.join(f'{i}. {game["name"]}' for i, game in enumerate(json, start=1))
-    formatted_text = GAMES_TEXT.format(game_names)
+    reply_markup = {
+        'inline_keyboard': [
+        ]
+    }
 
-    await bot.send_message(message=formatted_text, chat_id=message.chat.id)
+    for game in games_json:
+        reply_markup['inline_keyboard'].append([
+            {
+                'text': game['name'],
+                'callback_data': f'game-{game["id"]}'
+            }
+        ])
 
+    await bot.send_message(message='Available games', chat_id=message.chat.id, reply_markup=reply_markup)

@@ -21,6 +21,7 @@ async def main() -> None:
             await store.botq.send(updates)
         except Exception:
             logger.info(f'telegram bot stopped at {datetime.now()}')
+            break
 
 if __name__ == '__main__':
     run(main())

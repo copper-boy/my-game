@@ -14,8 +14,11 @@ def load_config():
 
 
 def create_application() -> FastAPI:
-    application = FastAPI()
-    application.include_router(api_router, prefix='/api')
+    application = FastAPI(title='Auth',
+                          openapi_url='/api/openapi.json',
+                          docs_url='/api/docs',
+                          redoc_url='/api/redoc')
+    application.include_router(api_router, prefix='/api', tags=['API'])
 
     register_all_exception_handlers(application)
 

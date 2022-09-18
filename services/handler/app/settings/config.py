@@ -13,8 +13,7 @@ def get_amqp_settings() -> AMQPSettings:
 
 
 class AdminSettings(BaseSettings):
-    ADMIN_LOGIN: str
-    ADMIN_PASSWORD: str
+    INFINITY_ADMIN_TOKEN: str
 
 
 @lru_cache()
@@ -22,17 +21,26 @@ def get_admin_settings() -> AdminSettings:
     return AdminSettings()
 
 
-class AuthSiteSettings(BaseSettings):
-    AUTH_SITE_URL: str
+class ApiSiteSettings(BaseSettings):
+    API_SITE_BASE_URL: str
 
 
 @lru_cache()
-def get_auth_site_settings() -> AuthSiteSettings:
-    return AuthSiteSettings()
+def get_api_site_settings() -> ApiSiteSettings:
+    return ApiSiteSettings()
+
+
+class DatabaseSettings(BaseSettings):
+    HANDLER_DATABASE_URI: str
+
+
+@lru_cache()
+def get_database_settings() -> DatabaseSettings:
+    return DatabaseSettings()
 
 
 class TelegramBotSettings(BaseSettings):
-    TELEGRAM_BOT_ACCESS_TOKEN: str
+    TELEGRAM_BOT_API_TOKEN: str
 
 
 @lru_cache()

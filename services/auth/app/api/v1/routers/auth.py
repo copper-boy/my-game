@@ -6,8 +6,7 @@ from fastapi_jwt_auth import AuthJWT
 
 from app.orm.user import user_pydantic_out
 from app.schemas.auth import AuthSchema, RegistrationSchema
-from app.settings.config import (get_admin_infinity_token_settings,
-                                 get_admin_settings)
+from app.settings.config import get_admin_settings
 from app.utils.auth import authenticate_user, register_user
 from app.utils.decorators import login_required
 from app.utils.user import (get_user_by_email, update_user_to_admin,

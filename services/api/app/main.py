@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.param_functions import Query, Header
+from fastapi.param_functions import Query
 from fastapi.responses import JSONResponse
 from tortoise.contrib.fastapi import register_tortoise
 

@@ -1,13 +1,15 @@
 from tortoise import Model
 from tortoise.contrib.pydantic import pydantic_model_creator
 from tortoise.fields.data import BigIntField, CharField, IntField, TextField
-from tortoise.fields.relational import (ForeignKeyField, ForeignKeyRelation, ReverseRelation)
+from tortoise.fields.relational import (ForeignKeyField, ForeignKeyRelation,
+                                        OneToOneField, OneToOneRelation,
+                                        ReverseRelation)
 
 
 class GameModel(Model):
-    id = BigIntField(pk=True, index=True)
+    id = BigIntField(pk=True)
 
-    name = CharField(max_length=200, unique=True)
+    name = CharField(max_length=200, unique=True, index=True)
 
     themes: ReverseRelation
 
@@ -21,7 +23,7 @@ game_pydantic_out = pydantic_model_creator(GameModel,
 
 
 class ThemeModel(Model):
-    id = BigIntField(pk=True, index=True)
+    id = BigIntField(pk=True)
 
     title = TextField()
 
@@ -46,7 +48,7 @@ class QuestionModel(Model):
 
     theme: ForeignKeyRelation['ThemeModel'] = ForeignKeyField(model_name='models.ThemeModel',
                                                               related_name='questions')
-    answer: ForeignKeyRelation
+    answer: OneToOneRelation
 
 
 question_pydantic_in = pydantic_model_creator(QuestionModel,
@@ -62,8 +64,8 @@ class AnswerModel(Model):
 
     correct = TextField()
 
-    question: ForeignKeyRelation['QuestionModel'] = ForeignKeyField(model_name='models.AnswerModel',
-                                                                    related_name='answer')
+    question: OneToOneRelation = OneToOneField(model_name='models.QuestionModel',
+                                               related_name='answer')
 
 
 answer_pydantic_in = pydantic_model_creator(AnswerModel,

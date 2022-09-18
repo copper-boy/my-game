@@ -70,9 +70,22 @@ services:
       - api_db
       - auth_service
     restart: on-failure
+  handler_db:
+    image: postgres:latest
+    volumes:
+      - postgres_data_handler:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${PG_HANDLER_USER}
+      POSTGRES_PASSWORD: ${PG_HANDLER_PASSWORD}
+      POSTGRES_DB: ${PG_HANDLER_DB}
+    expose:
+      - 5432
+    restart: on-failure
   handler_service:
     image: my-game-handler:latest
-    command: python app/main.py
+    command: bash -c "while !</dev/tcp/handler_db/5432; do sleep 1; done; python app/main.py"
     build: ./services/handler
     volumes:
       - ./services/handler/:/handler
@@ -81,7 +94,10 @@ services:
       - .env
       - .telegram.env
     depends_on:
+      - handler_db
       - api_service
+    ports:
+      - '8080:8080'
     restart: on-failure
   rabbit:
     image: rabbitmq:management
@@ -96,9 +112,9 @@ services:
       - 15672
     volumes:
       - rabbitmq_data:/data
-
 volumes:
   postgres_data_api:
   postgres_data_auth:
+  postgres_data_handler:
 
   rabbitmq_data:
