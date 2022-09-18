@@ -85,7 +85,7 @@ docker-compose down --volumes
 
 ## Contact me
 
-As you can contact me with:
+How can you contact me:
 
 **Gmail: seryurmed@gmail.com**<br>
 **Telegram: t.me.copper_boy**
