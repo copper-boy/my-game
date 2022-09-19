@@ -1,8 +1,5 @@
-from aiohttp.client import ClientSession
-
 from app.integration.api import get_theme
 from app.schemas.message import CallbackSchema
-from app.settings.config import get_api_site_settings
 
 
 async def theme_callback_handler(bot, callback: CallbackSchema) -> None:
@@ -12,8 +9,7 @@ async def theme_callback_handler(bot, callback: CallbackSchema) -> None:
 
     (_, theme_id) = callback.data.split('-')
 
-    async with ClientSession(base_url=get_api_site_settings().API_SITE_BASE_URL) as client:
-        theme = await get_theme(client=client, theme_id=int(theme_id))
+    theme = await get_theme(client=bot.app.store.aiohttp_session_accessor.aiohttp_session, theme_id=int(theme_id))
 
     if theme is None:
         return await bot.send_message(message=f'@{callback.message_from.username} theme not found on server',

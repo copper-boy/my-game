@@ -62,6 +62,10 @@ async def create_question(title: str, cost: int, theme: ThemeModel) -> QuestionM
     return question
 
 
-async def get_question_by_id(id: int) -> AnswerModel:
-    answer = await QuestionModel.get_or_none(id=id)
-    return answer
+async def get_question_by_id(id: int) -> QuestionModel:
+    question = await QuestionModel.get_or_none(id=id)
+    return question
+
+
+async def get_questions_count(theme_id: int) -> int:
+    return await QuestionModel.filter(theme_id=theme_id).count()

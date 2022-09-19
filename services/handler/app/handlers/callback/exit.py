@@ -35,12 +35,12 @@ async def exit_callback_handler(bot, callback: CallbackSchema) -> None:
                 game_state.state == GameStateEnum.WAIT_FOR_PLAYERS:
             return None
 
-        username = await bot.get_chat_member_username(chat_id=callback.message.chat.id, user_id=player.telegram_id)
-
         await bot.app.store.questions_sessions.delete_question_session(session_id=session.id)
         await bot.app.store.players.delete_player(player_id=player.id)
         await bot.app.store.game_states.delete_game_state(game_state_id=game_state.id)
         await bot.app.store.sessions.delete_session(session_id=session.id)
+
+        username = await bot.get_chat_member_username(chat_id=callback.message.chat.id, user_id=player.telegram_id)
 
         return await bot.send_message(message=f'Winner @{username} with pot {player.pot}!',
                                       chat_id=callback.message.chat.id)

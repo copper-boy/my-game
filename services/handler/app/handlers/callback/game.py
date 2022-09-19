@@ -1,10 +1,7 @@
-from aiohttp.client import ClientSession
-
 from app.integration.api import get_game
 from app.keyboard import GAME_KEYBOARD
 from app.orm.game_state import GameStateEnum
 from app.schemas.message import CallbackSchema
-from app.settings.config import get_api_site_settings
 
 GAME_TEXT = """
 Game has been created!
@@ -23,8 +20,7 @@ async def game_callback_handler(bot, callback: CallbackSchema) -> None:
         game_state = await bot.app.store.game_states.create_game_state(session=session)
 
     (_, game_id) = callback.data.split('-')
-    async with ClientSession(base_url=get_api_site_settings().API_SITE_BASE_URL) as client:
-        game = await get_game(client=client, game_id=int(game_id))
+    game = await get_game(client=bot.app.store.aiohttp_session_accessor.aiohttp_session, game_id=int(game_id))
 
     if game is None:
         return await bot.send_message(message=f'@{callback.message_from.username} game not found on server',

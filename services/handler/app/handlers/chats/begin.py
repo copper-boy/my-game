@@ -1,11 +1,8 @@
 from random import choice
 
-from aiohttp.client import ClientSession
-
 from app.integration.api import get_themes
 from app.orm.game_state import GameStateEnum
 from app.schemas.message import MessageSchema
-from app.settings.config import get_api_site_settings
 
 SELECT_THEME = """
 Current player is @{}, please, select theme!
@@ -27,12 +24,11 @@ async def begin_command_handler(bot, message: MessageSchema) -> None:
         return await bot.send_message(message='Not enough players!', chat_id=message.chat.id)
     player = choice(players)[0]
 
+    themes = await get_themes(session=bot.app.store.aiohttp_session_accessor.aiohttp_session, game_id=session.game_id)
+
     await bot.app.store.game_states.update_game_state(game_state_id=game_state.id,
                                                       current_player=player.id,
                                                       state=GameStateEnum.WAIT_FOR_PLAYER_ACTION)
-
-    async with ClientSession(base_url=get_api_site_settings().API_SITE_BASE_URL) as __session:
-        themes = await get_themes(session=__session, game_id=session.game_id)
 
     await bot.send_message(message='Themes', chat_id=message.chat.id, reply_markup=themes)
 

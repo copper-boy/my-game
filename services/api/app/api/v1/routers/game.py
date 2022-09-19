@@ -10,7 +10,8 @@ from app.utils.game import (create_answer, create_game, create_question,
                             create_theme, get_answer_by_question,
                             get_game_by_id, get_game_by_name, get_games_count,
                             get_games_list, get_question_by_id,
-                            get_theme_by_id, get_themes_list)
+                            get_questions_count, get_theme_by_id,
+                            get_themes_list)
 
 router = APIRouter()
 
@@ -91,9 +92,8 @@ async def get_game(token: str = Query(...),
 @router.get('/count/games')
 async def count_games(token: str = Query(...)) -> dict:
     count = await get_games_count()
-    return {
-        'count': await count
-    }
+
+    return {'count': count}
 
 
 @router.get('/games', response_model=list[game_pydantic_out])
@@ -145,6 +145,13 @@ async def list_question(token: str = Query(...),
                                                        question in theme.questions]
 
     return questions_pydantic
+
+
+@router.get('/count/questions')
+async def count_questions(token: str = Query(...),
+                          theme_id: int = Query(...)) -> dict:
+    count = await get_questions_count(theme_id)
+    return {'count': count}
 
 
 @router.get('/questions/{question_id}', response_model=question_pydantic_out)

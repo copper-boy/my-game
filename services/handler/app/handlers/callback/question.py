@@ -1,9 +1,6 @@
-from aiohttp.client import ClientSession
-
 from app.integration.api import get_question
 from app.orm.game_state import GameStateEnum
 from app.schemas.message import CallbackSchema
-from app.settings.config import get_api_site_settings
 
 
 async def question_callback_handler(bot, callback: CallbackSchema) -> None:
@@ -35,12 +32,19 @@ async def question_callback_handler(bot, callback: CallbackSchema) -> None:
             message=f'@{callback.message_from.username} the question has already been selected in the game',
             chat_id=callback.message.chat.id)
 
-    async with ClientSession(base_url=get_api_site_settings().API_SITE_BASE_URL) as client:
-        question = await get_question(client=client, question_id=int(question_id))
+    question = await get_question(client=bot.app.store.aiohttp_session_accessor.aiohttp_session, question_id=int(question_id))
 
     if question is None:
         return await bot.send_message(message='The question does not exist on the server',
                                       chat_id=callback.message.chat.id)
+
+    await bot.app.store.questions_sessions.create_question_session(session=session,
+                                                                   question_id=int(question_id))
+    await bot.app.store.game_states.update_game_state(game_state_id=game_state.id,
+                                                      current_question_id=int(question_id),
+                                                      current_player=0,
+                                                      state=GameStateEnum.WAIT_FOR_PLAYER_ANSWER)
+
     title = question['title']
 
     await bot.send_message(message=f'The question is: {title}', chat_id=callback.message.chat.id, reply_markup={
@@ -53,9 +57,3 @@ async def question_callback_handler(bot, callback: CallbackSchema) -> None:
             ]
         ]
     })
-    await bot.app.store.questions_sessions.create_question_session(session=session,
-                                                                   question_id=int(question_id))
-    await bot.app.store.game_states.update_game_state(game_state_id=game_state.id,
-                                                      current_question_id=int(question_id),
-                                                      current_player=0,
-                                                      state=GameStateEnum.WAIT_FOR_PLAYER_ANSWER)

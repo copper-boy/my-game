@@ -1,10 +1,10 @@
 from aiohttp.client import ClientSession
 
-from app.settings.config import get_admin_settings
+from app.settings.config import get_admin_settings, get_api_site_settings
 
 
 async def get_game(client: ClientSession, game_id: int) -> dict | None:
-    async with client.get(url=f'/api/v1/admin/games/{game_id}',
+    async with client.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/games/{game_id}',
                           params={
                               'token': get_admin_settings().INFINITY_ADMIN_TOKEN
                           }) as response:
@@ -17,7 +17,7 @@ async def get_game(client: ClientSession, game_id: int) -> dict | None:
 
 
 async def get_games(client: ClientSession) -> dict:
-    async with client.get('/api/v1/admin/games',
+    async with client.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/games',
                           params={
                               'token': get_admin_settings().INFINITY_ADMIN_TOKEN
                           }) as games_response:
@@ -27,7 +27,7 @@ async def get_games(client: ClientSession) -> dict:
 
 
 async def get_answer(client: ClientSession, question_id: int) -> dict | None:
-    async with client.get(url=f'/api/v1/admin/answers/{question_id}',
+    async with client.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/answers/{question_id}',
                           params={
                               'token': get_admin_settings().INFINITY_ADMIN_TOKEN
                           }) as response:
@@ -40,7 +40,7 @@ async def get_answer(client: ClientSession, question_id: int) -> dict | None:
 
 
 async def get_question(client: ClientSession, question_id: int) -> dict | None:
-    async with client.get(url=f'/api/v1/admin/questions/{question_id}',
+    async with client.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/questions/{question_id}',
                           params={
                               'token': get_admin_settings().INFINITY_ADMIN_TOKEN
                           }) as response:
@@ -53,7 +53,7 @@ async def get_question(client: ClientSession, question_id: int) -> dict | None:
 
 
 async def get_questions(session: ClientSession, theme_id: int) -> list[dict]:
-    async with session.get('/api/v1/admin/questions',
+    async with session.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/questions',
                            params={
                                'token': get_admin_settings().INFINITY_ADMIN_TOKEN,
                                'theme_id': theme_id
@@ -70,8 +70,19 @@ async def get_questions(session: ClientSession, theme_id: int) -> list[dict]:
     return reply_markup
 
 
+async def get_questions_count(session: ClientSession, theme_id: int) -> int:
+    async with session.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/count/questions',
+                           params={
+                               'token': get_admin_settings().INFINITY_ADMIN_TOKEN,
+                               'theme_id': theme_id
+                           }) as response:
+        response = await response.json()
+
+    return response['count']
+
+
 async def get_theme(client: ClientSession, theme_id: int) -> dict | None:
-    async with client.get(url=f'/api/v1/themes/{theme_id}',
+    async with client.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/themes/{theme_id}',
                           params={
                               'token': get_admin_settings().INFINITY_ADMIN_TOKEN
                           }) as response:
@@ -87,7 +98,7 @@ async def get_themes(session: ClientSession, game_id: int) -> dict:
         'inline_keyboard': []
     }
 
-    async with session.get(url='/api/v1/admin/themes',
+    async with session.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/themes',
                            params={
                                'token': get_admin_settings().INFINITY_ADMIN_TOKEN,
                                'game_id': game_id

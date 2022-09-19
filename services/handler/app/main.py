@@ -5,7 +5,6 @@ from logging import getLogger
 from aio_pika import IncomingMessage, connect
 from aiohttp.web import Application, Request, json_response, run_app
 
-from app.bot import Bot
 from app.settings.config import get_amqp_settings, get_telegram_bot_settings
 from app.store import setup_store
 
@@ -22,8 +21,7 @@ async def root(request: Request) -> json_response:
 
 async def on_message(message: IncomingMessage) -> None:
     updates: list = loads(message.body.decode('utf-8'))
-
-    await bot.handle(updates)
+    await app.store.bot_accessor.handle(updates)
 
 
 async def get_connection() -> None:
@@ -69,7 +67,6 @@ def setup_application() -> Application:
 
 
 app = setup_application()
-bot = Bot(application=app, bot_token=get_telegram_bot_settings().TELEGRAM_BOT_API_TOKEN)
 
 if __name__ == '__main__':
     run_app(app)

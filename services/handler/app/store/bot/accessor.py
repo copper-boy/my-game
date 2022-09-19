@@ -1,11 +1,12 @@
 from asyncio import Queue, ensure_future, get_event_loop
 from logging import getLogger
 from re import compile
+from typing import Any
 
 from aiohttp import ClientSession
-from aiohttp.web import Application
-from asyncpool import AsyncPool
 
+from app.asyncpool import AsyncPool
+from app.base.base_accessor import BaseAccessor
 from app.handlers import bad_message
 from app.handlers.actions import answer
 from app.handlers.callback import answer as answer_callback
@@ -44,18 +45,34 @@ handlers_callback = {
 }
 
 
-class Bot:
-    app: Application
+class BotAccessor(BaseAccessor):
     bot_token: str
 
-    def __init__(self, application: Application, bot_token: str) -> None:
-        self.app = application
+    queue: Queue | None = None
+    future: Any = None
+    async_pool: AsyncPool | None = None
+
+    def __init__(self, bot_token: str, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
         self.bot_token = bot_token
 
-    @staticmethod
-    async def result_reader(queue: Queue) -> None:
+    async def connect(self, *_: list, **__: dict) -> None:
+        loop = get_event_loop()
+        self.queue = Queue()
+        self.future = ensure_future(coro_or_future=self.result_reader(), loop=loop)
+
+        self.async_pool = AsyncPool(loop=loop, num_workers=5, name='UpdatePool',
+                                    logger=logger, worker_co=self.handle_update)
+
+        self.async_pool.start()
+
+    async def disconnect(self, *_: list, **__: dict) -> None:
+        await self.async_pool.join()
+
+    async def result_reader(self) -> None:
         while True:
-            value = await queue.get()
+            value = await self.queue.get()
             if value is True:
                 break
 
@@ -85,26 +102,20 @@ class Bot:
                 await queue.put(result)
 
     async def handle(self, updates: list) -> None:
-        queue = Queue()
-        loop = get_event_loop()
-        future = ensure_future(coro_or_future=self.result_reader(queue=queue), loop=loop)
+        for update in updates:
+            await self.async_pool.push(update, self.queue)
 
-        async with AsyncPool(loop=loop, num_workers=5, name='UpdatePool',
-                             logger=logger, worker_co=self.handle_update) as pool:
-            for update in updates:
-                await pool.push(update, queue)
-
-        await queue.put(True)
-        await future
+        await self.queue.put(True)
+        await self.future
 
     async def get_chat_member_username(self, chat_id: int, user_id: int) -> str:
-        async with ClientSession(base_url='https://api.telegram.org') as session:
-            async with session.get(url=f'/bot{self.bot_token}/getChatMember',
-                                   params={
-                                       'chat_id': chat_id,
-                                       'user_id': user_id
-                                   }) as response:
-                json = await response.json()
+        async with self.app.store.aiohttp_session_accessor.aiohttp_session.get(
+                url=f'https://api.telegram.org/bot{self.bot_token}/getChatMember',
+                params={
+                    'chat_id': chat_id,
+                    'user_id': user_id
+                }) as response:
+            json = await response.json()
         return json['result']['user']['username']
 
     async def send_message(self, chat_id: int, message: str, reply_markup: dict | None = None) -> None:
@@ -115,18 +126,18 @@ class Bot:
         if reply_markup:
             data['reply_markup'] = reply_markup
 
-        async with ClientSession(base_url='https://api.telegram.org') as session:
-            async with session.post(url=f'/bot{self.bot_token}/sendMessage',
-                                    json=data) as response:
-                json = await response.json()
+        async with self.app.store.aiohttp_session_accessor.aiohttp_session.post(
+                url=f'https://api.telegram.org/bot{self.bot_token}/sendMessage',
+                json=data) as response:
+            json = await response.json()
         logger.info(json)
 
     async def send_sticker(self, chat_id: int, sticker: str) -> None:
-        async with ClientSession(base_url='https://api.telegram.org') as session:
-            async with session.post(url=f'/bot{self.bot_token}/sendSticker',
-                                    json={
-                                        'chat_id': chat_id,
-                                        'sticker': sticker
-                                    }) as response:
-                json = await response.json()
+        async with self.app.store.aiohttp_session_accessor.aiohttp_session.post(
+                url=f'https://api.telegram.org/bot{self.bot_token}/sendSticker',
+                json={
+                    'chat_id': chat_id,
+                    'sticker': sticker
+                }) as response:
+            json = await response.json()
         logger.info(json)

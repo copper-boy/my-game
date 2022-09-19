@@ -82,6 +82,8 @@ services:
       POSTGRES_DB: ${PG_HANDLER_DB}
     expose:
       - 5432
+    ports:
+      - '5432:5432'
     restart: on-failure
   handler_service:
     image: my-game-handler:latest
@@ -92,6 +94,7 @@ services:
     env_file:
       - .admin.env
       - .env
+      - .site.env
       - .telegram.env
     depends_on:
       - handler_db
