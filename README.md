@@ -35,7 +35,7 @@ First of all you need to create .env files:
     PG_HANDLER_PASSWORD=handler
     PG_HANDLER_DB=handler
     
-    HANDLER_DATABASE_URI=postgresql+asyncpg://handler:handler@handler_db:5432/handler
+    HANDLER_DATABASE_URI=asyncpg://handler:handler@handler_db:5432/handler
     
     RABBITMQ_USERNAME=rabbit
     RABBITMQ_PASSWORD=rabbit
@@ -88,4 +88,4 @@ docker-compose down --volumes
 How can you contact me:
 
 **Gmail: seryurmed@gmail.com**<br>
-**Telegram: https://t.me/copper_boy**
+**Telegram: t.me.copper_boy**
