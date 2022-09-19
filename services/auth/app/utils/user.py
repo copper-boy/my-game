@@ -15,9 +15,7 @@ async def get_user_by_email(email: EmailStr) -> UserModel:
 
 
 async def update_user_to_admin(user: UserModel) -> None:
-    await user.update_from_dict({
-            'is_admin': True
-    })
+    await user.update_from_dict({'is_admin': True})
     await user.save()
 
 

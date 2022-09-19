@@ -1,6 +1,5 @@
 from sqlalchemy import and_, delete, select, update
-from sqlalchemy.orm import load_only
-from sqlalchemy.sql.functions import count
+from sqlalchemy.sql.functions import count, random
 
 from app.base.base_accessor import BaseAccessor
 from app.orm.player import PlayerModel
@@ -49,6 +48,14 @@ class PlayerAccessor(BaseAccessor):
                                                    PlayerModel.session_id == session_id)))
 
         return sql.scalar()
+
+    @staticmethod
+    async def get_random_player_by_session_id(sql_session, session_id: int) -> PlayerModel:
+        scalar = await sql_session.execute(select(PlayerModel).
+                                           where(PlayerModel.session_id == session_id).
+                                           order_by(random()))
+
+        return scalar.scalars().first()
 
     @staticmethod
     async def get_players_by_session_id(sql_session, session_id: int) -> list[PlayerModel]:

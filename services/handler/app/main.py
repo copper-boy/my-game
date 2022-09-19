@@ -5,7 +5,7 @@ from logging import getLogger
 from aio_pika import IncomingMessage, connect
 from aiohttp.web import Application, Request, json_response, run_app
 
-from app.settings.config import get_amqp_settings, get_telegram_bot_settings
+from app.settings.config import get_amqp_settings
 from app.store import setup_store
 
 logger = getLogger(__name__)

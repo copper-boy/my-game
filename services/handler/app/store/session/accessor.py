@@ -1,7 +1,6 @@
 from sqlalchemy import delete, select, update
 
 from app.base.base_accessor import BaseAccessor
-from app.orm.player import PlayerModel
 from app.orm.session import SessionModel
 
 

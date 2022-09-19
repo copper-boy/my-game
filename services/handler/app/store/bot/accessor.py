@@ -27,7 +27,7 @@ handlers = {
     '/games': games.games_command_handler,
 
     '/begin': begin.begin_command_handler,
-    '/end': end.env_command_handler,
+    '/end': end.end_command_handler,
 
     '/done': done.done_command_handler,
 

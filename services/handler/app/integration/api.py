@@ -109,6 +109,7 @@ async def get_themes(session: ClientSession, game_id: int) -> tuple[int, dict]:
         get_themes_json = await get_themes_response.json()
 
     for theme in get_themes_json:
+        print(get_themes_json)
         count += await get_questions_count(session=session, theme_id=theme['id'])
         questions = await get_questions(session=session, theme_id=theme['id'])
         keyboard = [

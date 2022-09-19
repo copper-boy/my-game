@@ -121,8 +121,8 @@ async def list_theme(token: str = Query(...),
 
 
 @router.get('/themes/{theme_id}', response_model=theme_pydantic_out)
-async def list_theme(token: str = Query(...),
-                     theme_id: int = Path(...)) -> theme_pydantic_out:
+async def get_theme(token: str = Query(...),
+                    theme_id: int = Path(...)) -> theme_pydantic_out:
     theme = await get_theme_by_id(theme_id)
     if theme is None:
         raise HTTPException(status_code=404,

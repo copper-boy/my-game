@@ -1,24 +1,19 @@
 from app.keyboard import get_join_exit_keyboard
 from app.orm.game_state import GameStateEnum
 from app.schemas.message import CallbackSchema
+from app.utils.decorators.handle_exceptions import handle_exceptions
 from app.utils.decorators.session import transaction
 
 
+@handle_exceptions
 @transaction
 async def exit_callback_handler(bot, callback: CallbackSchema, sql_session=None) -> None:
     session = await bot.app.store.sessions.get_session_by_chat_id(sql_session=sql_session,
                                                                   chat_id=callback.message.chat.id)
-    if session is None:
-        return await bot.send_message(message=bot.message_helper.bad_message(username=callback.message_from.username),
-                                      chat_id=callback.message.chat.id)
 
     player = await bot.app.store.players.get_player_by_telegram_id(sql_session=sql_session,
                                                                    telegram_id=callback.message_from.id,
                                                                    session_id=session.id)
-
-    if player is None:
-        return await bot.send_message(message=bot.message_helper.bad_message(username=callback.message_from.username),
-                                      chat_id=callback.message.chat.id)
 
     await bot.app.store.players.delete_player(sql_session=sql_session,
                                               player_id=player.id)
