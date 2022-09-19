@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from aiohttp.client import ClientSession
 
 from app.settings.config import get_admin_settings, get_api_site_settings
@@ -93,7 +95,8 @@ async def get_theme(client: ClientSession, theme_id: int) -> dict | None:
     return json
 
 
-async def get_themes(session: ClientSession, game_id: int) -> dict:
+async def get_themes(session: ClientSession, game_id: int) -> tuple[int, dict]:
+    count = 0
     reply_markup = {
         'inline_keyboard': []
     }
@@ -105,16 +108,17 @@ async def get_themes(session: ClientSession, game_id: int) -> dict:
                            }) as get_themes_response:
         get_themes_json = await get_themes_response.json()
 
-        for theme in get_themes_json:
-            questions = await get_questions(session=session, theme_id=theme['id'])
-            keyboard = [
-                {
-                    'text': theme['title'],
-                    'callback_data': f'theme-{theme["id"]}'
-                },
-            ]
-            keyboard.extend(questions)
+    for theme in get_themes_json:
+        count += await get_questions_count(session=session, theme_id=theme['id'])
+        questions = await get_questions(session=session, theme_id=theme['id'])
+        keyboard = [
+            {
+                'text': theme['title'],
+                'callback_data': f'theme-{theme["id"]}'
+            },
+        ]
+        keyboard.extend(questions)
 
-            reply_markup['inline_keyboard'].append(keyboard)
+        reply_markup['inline_keyboard'].append(keyboard)
 
-    return reply_markup
+    return count, reply_markup

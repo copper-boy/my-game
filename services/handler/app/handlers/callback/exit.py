@@ -1,13 +1,15 @@
 from app.keyboard import GAME_KEYBOARD
 from app.orm.game_state import GameStateEnum
 from app.schemas.message import CallbackSchema
+from app.utils.decorators.session import transaction
 
 EXIT_TEXT = """
 @{} left game!
 """
 
 
-async def exit_callback_handler(bot, callback: CallbackSchema) -> None:
+@transaction
+async def exit_callback_handler(bot, callback: CallbackSchema, sql_session=None) -> None:
     session = await bot.app.store.sessions.get_session_by_chat_id(chat_id=callback.message.chat.id)
     if session is None:
         return await bot.send_message(message='No chat game!', chat_id=callback.message.chat.id)
@@ -27,8 +29,8 @@ async def exit_callback_handler(bot, callback: CallbackSchema) -> None:
     players = await bot.app.store.players.get_players_by_session_id(session_id=session.id)
     players_count = await bot.app.store.players.get_players_count(session_id=session.id)
 
-    if players_count.first() == 1:
-        player = players[0][0]
+    if players_count == 1:
+        player = players.first()
         game_state = await bot.app.store.game_states.get_game_state_by_session_id(session_id=session.id)
         if game_state is None or \
                 game_state.state == GameStateEnum.WAIT_FOR_SELECT_GAME or \

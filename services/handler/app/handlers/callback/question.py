@@ -1,19 +1,24 @@
 from app.integration.api import get_question
 from app.orm.game_state import GameStateEnum
 from app.schemas.message import CallbackSchema
+from app.utils.decorators.session import transaction
 
 
-async def question_callback_handler(bot, callback: CallbackSchema) -> None:
-    session = await bot.app.store.sessions.get_session_by_chat_id(chat_id=callback.message.chat.id)
+@transaction
+async def question_callback_handler(bot, callback: CallbackSchema, sql_session=None) -> None:
+    session = await bot.app.store.sessions.get_session_by_chat_id(sql_session=sql_session,
+                                                                  chat_id=callback.message.chat.id)
 
     if session:
-        game_state = await bot.app.store.game_states.get_game_state_by_session_id(session_id=session.id)
+        game_state = await bot.app.store.game_states.get_game_state_by_session_id(sql_session=sql_session,
+                                                                                  session_id=session.id)
         if game_state.state != GameStateEnum.WAIT_FOR_PLAYER_ACTION:
             return await bot.send_message(message='Unable to select a question!', chat_id=callback.message.chat.id)
     else:
         return await bot.send_message(message='The game must be started!', chat_id=callback.message.chat.id)
 
-    player = await bot.app.store.players.get_player_by_telegram_id(session_id=session.id,
+    player = await bot.app.store.players.get_player_by_telegram_id(sql_session=sql_session,
+                                                                   session_id=session.id,
                                                                    telegram_id=callback.message_from.id)
     if player is None:
         return await bot.send_message(message=f'@{callback.message_from.username} you should be in the game!',
@@ -24,7 +29,8 @@ async def question_callback_handler(bot, callback: CallbackSchema) -> None:
 
     (_, question_id) = callback.data.split('-')
 
-    question_session = await bot.app.store.questions_sessions.get_question_session_by_id(session_id=session.id,
+    question_session = await bot.app.store.questions_sessions.get_question_session_by_id(sql_session=sql_session,
+                                                                                         session_id=session.id,
                                                                                          question_id=question_id)
 
     if question_session:
@@ -38,9 +44,11 @@ async def question_callback_handler(bot, callback: CallbackSchema) -> None:
         return await bot.send_message(message='The question does not exist on the server',
                                       chat_id=callback.message.chat.id)
 
-    await bot.app.store.questions_sessions.create_question_session(session=session,
+    await bot.app.store.questions_sessions.create_question_session(sql_session=sql_session,
+                                                                   session=session,
                                                                    question_id=int(question_id))
-    await bot.app.store.game_states.update_game_state(game_state_id=game_state.id,
+    await bot.app.store.game_states.update_game_state(sql_session=sql_session,
+                                                      game_state_id=game_state.id,
                                                       current_question_id=int(question_id),
                                                       current_player=0,
                                                       state=GameStateEnum.WAIT_FOR_PLAYER_ANSWER)

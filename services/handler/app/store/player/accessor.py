@@ -11,54 +11,54 @@ class PlayerAccessor(BaseAccessor):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    async def create_player(self, session: SessionModel, telegram_id: str) -> PlayerModel:
+    @staticmethod
+    async def create_player(sql_session, session: SessionModel, telegram_id: str) -> PlayerModel:
         __player = PlayerModel(session=session, telegram_id=telegram_id)
 
-        async with self.app.database.session.begin() as __session:
-            __session.add(__player)
+        sql_session.add(__player)
 
         return __player
 
-    async def delete_player(self, player_id: int) -> None:
-        async with self.app.database.session.begin() as session:
-            await session.execute(delete(PlayerModel).
+    @staticmethod
+    async def delete_player(sql_session, player_id: int) -> None:
+        await sql_session.execute(delete(PlayerModel).
                                   where(PlayerModel.id == player_id))
 
-    async def update_player(self, player_id: int, pot: int) -> None:
-        async with self.app.database.session.begin() as session:
-            await session.execute(update(PlayerModel).
+    @staticmethod
+    async def update_player(sql_session, player_id: int, pot: int) -> None:
+        await sql_session.execute(update(PlayerModel).
                                   where(PlayerModel.id == player_id).
                                   values(pot=pot))
 
-    async def update_all_is_answered(self, session_id: int, is_answered: bool) -> bool:
-        async with self.app.database.session.begin() as session:
-            await session.execute(update(PlayerModel).
+    @staticmethod
+    async def update_all_is_answered(sql_session, session_id: int, is_answered: bool) -> bool:
+        await sql_session.execute(update(PlayerModel).
                                   where(PlayerModel.session_id == session_id).
                                   values(is_answered=is_answered))
 
-    async def update_is_answered(self, player_id: int, is_answered: bool) -> None:
-        async with self.app.database.session.begin() as session:
-            await session.execute(update(PlayerModel).
+    @staticmethod
+    async def update_is_answered(sql_session, player_id: int, is_answered: bool) -> None:
+        await sql_session.execute(update(PlayerModel).
                                   where(PlayerModel.id == player_id).
                                   values(is_answered=is_answered))
 
-    async def get_player_by_telegram_id(self, telegram_id: str, session_id: int) -> PlayerModel:
-        async with self.app.database.session() as session:
-            sql = await session.execute(select(PlayerModel).
+    @staticmethod
+    async def get_player_by_telegram_id(sql_session, telegram_id: str, session_id: int) -> PlayerModel:
+        sql = await sql_session.execute(select(PlayerModel).
                                         where(and_(PlayerModel.telegram_id == telegram_id,
                                                    PlayerModel.session_id == session_id)))
 
         return sql.scalar()
 
-    async def get_players_by_session_id(self, session_id: int) -> list[PlayerModel]:
-        async with self.app.database.session() as session:
-            scalars = await session.execute(select(PlayerModel).
+    @staticmethod
+    async def get_players_by_session_id(sql_session, session_id: int) -> list[PlayerModel]:
+        scalars = await sql_session.execute(select(PlayerModel).
                                             where(PlayerModel.session_id == session_id))
 
-        return scalars.all()
+        return scalars.scalars()
 
-    async def get_players_count(self, session_id: int) -> int:
-        async with self.app.database.session() as session:
-            sql = await session.execute(select(count(PlayerModel.id)).where(PlayerModel.session_id == session_id))
+    @staticmethod
+    async def get_players_count(sql_session, session_id: int) -> int:
+        sql = await sql_session.execute(select(count(PlayerModel.id)).where(PlayerModel.session_id == session_id))
 
-        return sql.scalars()
+        return sql.scalar()
