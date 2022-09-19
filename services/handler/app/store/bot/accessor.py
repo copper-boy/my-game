@@ -111,7 +111,15 @@ class BotAccessor(BaseAccessor):
         await self.queue.put(True)
         await self.future
 
+    async def is_user_admin(self, chat_id: int, user_id: int) -> bool:
+        chat_member = await self.__get_chat_member(chat_id=chat_id, user_id=user_id)
+        return chat_member['status'] == 'administrator'
+
     async def get_chat_member_username(self, chat_id: int, user_id: int) -> str:
+        chat_member = await self.__get_chat_member(chat_id=chat_id, user_id=user_id)
+        return chat_member['user']['username']
+
+    async def __get_chat_member(self, chat_id: int, user_id: int) -> dict:
         async with self.app.store.aiohttp_session_accessor.aiohttp_session.get(
                 url=f'https://api.telegram.org/bot{self.bot_token}/getChatMember',
                 params={
@@ -119,7 +127,7 @@ class BotAccessor(BaseAccessor):
                     'user_id': user_id
                 }) as response:
             json = await response.json()
-        return json['result']['user']['username']
+        return json['result']
 
     async def send_message(self, chat_id: int, message: str, reply_markup: dict | None = None) -> None:
         data = {
