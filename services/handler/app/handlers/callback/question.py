@@ -13,18 +13,21 @@ async def question_callback_handler(bot, callback: CallbackSchema, sql_session=N
         game_state = await bot.app.store.game_states.get_game_state_by_session_id(sql_session=sql_session,
                                                                                   session_id=session.id)
         if game_state.state != GameStateEnum.WAIT_FOR_PLAYER_ACTION:
-            return await bot.send_message(message='Unable to select a question!', chat_id=callback.message.chat.id)
+            return await bot.send_message(
+                message=bot.message_helper.bad_message(username=callback.message_from.username),
+                chat_id=callback.message.chat.id)
     else:
-        return await bot.send_message(message='The game must be started!', chat_id=callback.message.chat.id)
+        return await bot.send_message(message=bot.message_helper.bad_message(username=callback.message_from.username),
+                                      chat_id=callback.message.chat.id)
 
     player = await bot.app.store.players.get_player_by_telegram_id(sql_session=sql_session,
                                                                    session_id=session.id,
                                                                    telegram_id=callback.message_from.id)
     if player is None:
-        return await bot.send_message(message=f'@{callback.message_from.username} you should be in the game!',
+        return await bot.send_message(message=bot.message_helper.bad_message(username=callback.message_from.username),
                                       chat_id=callback.message.chat.id)
     if game_state.current_player != player.id:
-        return await bot.send_message(message=f'@{callback.message_from.username} you are not a current player!',
+        return await bot.send_message(message=bot.message_helper.bad_message(username=callback.message_from.username),
                                       chat_id=callback.message.chat.id)
 
     (_, question_id) = callback.data.split('-')
@@ -38,10 +41,11 @@ async def question_callback_handler(bot, callback: CallbackSchema, sql_session=N
             message=f'@{callback.message_from.username} the question has already been selected in the game',
             chat_id=callback.message.chat.id)
 
-    question = await get_question(client=bot.app.store.aiohttp_session_accessor.aiohttp_session, question_id=int(question_id))
+    question = await get_question(client=bot.app.store.aiohttp_session_accessor.aiohttp_session,
+                                  question_id=int(question_id))
 
     if question is None:
-        return await bot.send_message(message='The question does not exist on the server',
+        return await bot.send_message(message=bot.message_helper.bad_message(username=callback.message_from.username),
                                       chat_id=callback.message.chat.id)
 
     await bot.app.store.questions_sessions.create_question_session(sql_session=sql_session,

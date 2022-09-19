@@ -3,16 +3,15 @@ from logging import getLogger
 from re import compile
 from typing import Any
 
-from aiohttp import ClientSession
-
 from app.asyncpool import AsyncPool
 from app.base.base_accessor import BaseAccessor
 from app.handlers import bad_message
-from app.handlers.actions import answer
+from app.handlers.actions import answer, done
 from app.handlers.callback import answer as answer_callback
 from app.handlers.callback import exit, game, join, question, theme
-from app.handlers.chats import begin, games
+from app.handlers.chats import begin, end, games
 from app.handlers.helpers import about, help
+from app.message_helper import MessageHelper
 from app.schemas.message import (CallbackSchema, load_message_from_schema,
                                  load_message_schema)
 
@@ -28,6 +27,9 @@ handlers = {
     '/games': games.games_command_handler,
 
     '/begin': begin.begin_command_handler,
+    '/end': end.env_command_handler,
+
+    '/done': done.done_command_handler,
 
     '/answer': answer.answer_command_handler,
 }
@@ -56,6 +58,7 @@ class BotAccessor(BaseAccessor):
         super().__init__(*args, **kwargs)
 
         self.bot_token = bot_token
+        self.message_helper = MessageHelper()
 
     async def connect(self, *_: list, **__: dict) -> None:
         loop = get_event_loop()

@@ -8,7 +8,8 @@ from app.utils.decorators.session import transaction
 async def answer_command_handler(bot, message: MessageSchema, sql_session=None) -> None:
     session = await bot.app.store.sessions.get_session_by_chat_id(sql_session=sql_session, chat_id=message.chat.id)
     if session is None:
-        return await bot.send_message(message='No chat game!', chat_id=message.chat.id)
+        return await bot.send_message(message=bot.message_helper.bad_message(username=message.message_from.username),
+                                      chat_id=message.chat.id)
 
     player = await bot.app.store.players.get_player_by_telegram_id(sql_session=sql_session,
                                                                    session_id=session.id,
@@ -20,7 +21,7 @@ async def answer_command_handler(bot, message: MessageSchema, sql_session=None) 
             player.is_answered or \
             game_state.state != GameStateEnum.WAIT_FOR_PLAYER_ANSWER or \
             game_state.current_player != player.id:
-        return await bot.send_message(message=f'@{message.message_from.username} you can`t answer!',
+        return await bot.send_message(message=bot.message_helper.bad_message(username=message.message_from.username),
                                       chat_id=message.chat.id)
 
     answer_data = message.text.split()
@@ -32,7 +33,7 @@ async def answer_command_handler(bot, message: MessageSchema, sql_session=None) 
                                      question_id=game_state.current_question_id)
 
     if question is None or server_answer is None:
-        return await bot.send_message(message=f'@{message.message_from.username} impossible to answer the question!',
+        return await bot.send_message(message=bot.message_helper.bad_message(username=message.message_from.username),
                                       chat_id=message.chat.id)
 
     if player_answer.lower() == server_answer['correct'].lower():
@@ -69,9 +70,8 @@ async def answer_command_handler(bot, message: MessageSchema, sql_session=None) 
             await bot.send_message(message='\n'.join(bot_answer), chat_id=message.chat.id)
         else:
             await bot.send_message(message=f'@{message.message_from.username}, yea, this is current answer!',
-                                   chat_id=message.chat.id)
-
-            await bot.send_message(message='Themes', chat_id=message.chat.id, reply_markup=themes[1])
+                                   chat_id=message.chat.id,
+                                   reply_markup=themes[1])
     else:
         await bot.app.store.players.update_is_answered(sql_session=sql_session,
                                                        player_id=player.id,

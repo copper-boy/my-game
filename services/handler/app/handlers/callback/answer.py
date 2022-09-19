@@ -8,7 +8,8 @@ async def answer_callback_handler(bot, callback: CallbackSchema, sql_session=Non
     session = await bot.app.store.sessions.get_session_by_chat_id(sql_session=sql_session,
                                                                   chat_id=callback.message.chat.id)
     if session is None:
-        return await bot.send_message(message='No chat game!', chat_id=callback.message.chat.id)
+        return await bot.send_message(message=bot.message_helper.bad_message(username=callback.message_from.username),
+                                      chat_id=callback.message.chat.id)
 
     player = await bot.app.store.players.get_player_by_telegram_id(sql_session=sql_session,
                                                                    telegram_id=callback.message_from.id,
@@ -20,13 +21,14 @@ async def answer_callback_handler(bot, callback: CallbackSchema, sql_session=Non
             player.is_answered or \
             game_state.state != GameStateEnum.WAIT_FOR_PLAYER_ANSWER or \
             game_state.current_player != 0:
-        return await bot.send_message(message=f'@{callback.message_from.username} you can`t answer!',
-                                      chat_id=callback.message.chat.id)
+        return await bot.send_message(
+            message=bot.message_helper.bad_message(username=callback.message_from.username),
+            chat_id=callback.message.chat.id)
 
     await bot.app.store.game_states.update_game_state(sql_session=sql_session,
                                                       game_state_id=game_state.id,
                                                       current_question_id=game_state.current_question_id,
                                                       current_player=player.id,
                                                       state=GameStateEnum.WAIT_FOR_PLAYER_ANSWER)
-    await bot.send_message(message=f'@{callback.message_from.username} waiting for your reply',
+    await bot.send_message(message=f'@{callback.message_from.username} waiting for your reply...',
                            chat_id=callback.message.chat.id)
