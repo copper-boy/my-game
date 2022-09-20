@@ -7,9 +7,14 @@ in lowercase letters, no special char`s):
 /about - shows what this bot can do
 /help - shows a list of commands with their description
 
-/begin - starts the game
+/start - creates a game session
 
 /games - shows game list
+
+/begin - starts the game
+/end - delete game session available only to admins
+
+/done - shows the answer to the question if all players answered incorrectly
 
 /answer - [text] the player answers the question
 """
