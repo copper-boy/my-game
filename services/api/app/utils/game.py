@@ -37,12 +37,8 @@ async def get_games_list(offset: int) -> QuerySet[GameModel]:
     return games
 
 
-async def get_themes_count(game: GameModel) -> ThemeModel:
-    return await ThemeModel.filter(game=game).count()
-
-
-async def get_themes_list(game: GameModel, offset: int) -> QuerySet[ThemeModel]:
-    themes = await ThemeModel.filter(game=game).offset(offset)
+async def get_themes_list(game: GameModel) -> QuerySet[ThemeModel]:
+    themes = await ThemeModel.filter(game=game)
     return themes
 
 

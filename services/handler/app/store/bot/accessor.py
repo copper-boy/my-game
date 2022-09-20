@@ -9,7 +9,7 @@ from app.handlers import bad_message
 from app.handlers.actions import answer, done
 from app.handlers.callback import answer as answer_callback
 from app.handlers.callback import exit, game, join, question, theme
-from app.handlers.chats import begin, end, games
+from app.handlers.chats import begin, end, games, start
 from app.handlers.helpers import about, help
 from app.message_helper import MessageHelper
 from app.schemas.message import (CallbackSchema, load_message_from_schema,
@@ -23,6 +23,8 @@ pattern_callback = compile(r'[A-Za-z]+')
 handlers = {
     '/about': about.about_command_handler,
     '/help': help.help_command_handler,
+
+    '/start': start.start_command_handler,
 
     '/games': games.games_command_handler,
 

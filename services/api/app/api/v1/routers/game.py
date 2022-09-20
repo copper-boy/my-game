@@ -107,14 +107,13 @@ async def list_game(token: str = Query(...),
 
 @router.get('/themes', response_model=list[theme_pydantic_out])
 async def list_theme(token: str = Query(...),
-                     game_id: int = Query(...),
-                     offset: int = Query(default=0)) -> list[theme_pydantic_out]:
+                     game_id: int = Query(...)) -> list[theme_pydantic_out]:
     game = await get_game_by_id(id=game_id)
     if game is None:
         raise HTTPException(status_code=404,
                             detail='game not found')
 
-    themes = await get_themes_list(game=game, offset=offset)
+    themes = await get_themes_list(game=game)
     themes_pydantic: list[theme_pydantic_out] = [await theme_pydantic_out.from_tortoise_orm(theme) for theme in themes]
 
     return themes_pydantic

@@ -18,14 +18,18 @@ class SessionAccessor(BaseAccessor):
 
     @staticmethod
     async def delete_session(sql_session, session_id: int) -> None:
-        await sql_session.execute(delete(SessionModel).where(SessionModel.id == session_id))
+        await sql_session.execute(delete(SessionModel).
+                                  where(SessionModel.id == session_id))
 
     @staticmethod
     async def update_session(sql_session, session_id: int, game_id: int = 0) -> None:
-        await sql_session.execute(update(SessionModel).where(SessionModel.id == session_id).values(game_id=game_id))
+        await sql_session.execute(update(SessionModel).
+                                  where(SessionModel.id == session_id).
+                                  values(game_id=game_id))
 
     @staticmethod
     async def get_session_by_chat_id(sql_session, chat_id: str) -> SessionModel:
-        sql = await sql_session.execute(select(SessionModel).where(SessionModel.chat_id == chat_id))
+        sql = await sql_session.execute(select(SessionModel).
+                                        where(SessionModel.chat_id == chat_id))
 
         return sql.scalar()

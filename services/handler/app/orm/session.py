@@ -12,8 +12,8 @@ class SessionModel(SQLModel, table=True):
     __tablename__ = 'sessions'
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    chat_id: str = Field(default='', index=True, unique=True)
-    game_id: int = 0
+    chat_id: Optional[str] = Field(default=None, index=True, unique=True)
+    game_id: Optional[str] = Field(default=None, index=True)
 
     players: list['PlayerModel'] = Relationship(back_populates='session')
     game_state: Optional['GameStateModel'] = Relationship(back_populates='session',

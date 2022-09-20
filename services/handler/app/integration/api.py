@@ -21,7 +21,7 @@ async def get_game(client: ClientSession, game_id: int) -> dict | None:
 async def get_games(client: ClientSession) -> dict:
     async with client.get(url=f'{get_api_site_settings().API_SITE_BASE_URL}/api/v1/admin/games',
                           params={
-                              'token': get_admin_settings().INFINITY_ADMIN_TOKEN
+                              'token': get_admin_settings().INFINITY_ADMIN_TOKEN,
                           }) as games_response:
         json = await games_response.json()
 
@@ -109,7 +109,6 @@ async def get_themes(session: ClientSession, game_id: int) -> tuple[int, dict]:
         get_themes_json = await get_themes_response.json()
 
     for theme in get_themes_json:
-        print(get_themes_json)
         count += await get_questions_count(session=session, theme_id=theme['id'])
         questions = await get_questions(session=session, theme_id=theme['id'])
         keyboard = [
