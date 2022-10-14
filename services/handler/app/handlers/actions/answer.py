@@ -47,16 +47,18 @@ async def answer_command_handler(bot, message: MessageSchema, sql_session=None) 
         count = await bot.app.store.questions_sessions.get_questions_sessions_count(sql_session=sql_session,
                                                                                     session_id=session.id)
         if themes[0] == count:
+            bot_answer: list[str] = []
+            for player in await bot.app.store.players.get_players_by_session_id(sql_session=sql_session,
+                                                                                session_id=session.id):
+                username = await bot.get_chat_member_username(chat_id=message.chat.id, user_id=player.telegram_id)
+                s = f'@{username} has pot {player.pot}, gg!'
+                bot_answer.append(s)
+
+            await bot.send_message(message='\n'.join(bot_answer), chat_id=message.chat.id)
+
             await delete_session(store=bot.app.store,
                                  sql_session=sql_session,
                                  session=session)
-
-            end_message = await get_end_message(bot=bot,
-                                                sql_session=sql_session,
-                                                session=session,
-                                                chat_id=message.chat.id)
-            await bot.send_message(message=end_message, chat_id=message.chat.id)
-
         else:
             await bot.send_message(message=f'@{message.message_from.username}, yea, this is current answer!',
                                    chat_id=message.chat.id,
