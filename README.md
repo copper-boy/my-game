@@ -1,6 +1,5 @@
 # my-game
 
-<<<<<<< my-game/dev
 ## How to start
 
 First of all you need to create .env files:
@@ -90,5 +89,4 @@ How can you contact me:
 
 **Gmail: seryurmed@gmail.com**<br>
 **Telegram: t.me.copper_boy**
-=======
->>>>>>> master
+
