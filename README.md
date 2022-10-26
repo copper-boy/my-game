@@ -18,13 +18,7 @@ First of all you need to create .env files:
     PYTHONPATH=/app/
     PYTHONDONTWRITEBYTECODE=1
     PYTHONUNBUFFERED=1
-    
-    PG_AUTH_USER=auth
-    PG_AUTH_PASSWORD=auth
-    PG_AUTH_DB=auth
-    
-    AUTH_DATABASE_URI=asyncpg://auth:auth@auth_db:5432/auth
-    
+ 
     PG_API_USER=api
     PG_API_PASSWORD=api
     PG_API_DB=api
