@@ -18,13 +18,7 @@ First of all you need to create .env files:
     PYTHONPATH=/app/
     PYTHONDONTWRITEBYTECODE=1
     PYTHONUNBUFFERED=1
-    
-    PG_AUTH_USER=auth
-    PG_AUTH_PASSWORD=auth
-    PG_AUTH_DB=auth
-    
-    AUTH_DATABASE_URI=asyncpg://auth:auth@auth_db:5432/auth
-    
+ 
     PG_API_USER=api
     PG_API_PASSWORD=api
     PG_API_DB=api
@@ -49,7 +43,6 @@ First of all you need to create .env files:
     ```
   - .site.env
     ```dotenv
-    AUTH_SITE_BASE_URL=http://auth_service:8956
     API_SITE_BASE_URL=http://api_service:14961
     ```
   - .telegram.env
@@ -85,8 +78,6 @@ docker-compose down --volumes
 
 ## Contact me
 
-How can you contact me:
-
-**Gmail: seryurmed@gmail.com**<br>
-**Telegram: t.me.copper_boy**
-
++ How can you contact me:
+  - sermed512@gmail.com
+  - https://t.me/copper_boy
