@@ -49,7 +49,6 @@ First of all you need to create .env files:
     ```
   - .site.env
     ```dotenv
-    AUTH_SITE_BASE_URL=http://auth_service:8956
     API_SITE_BASE_URL=http://api_service:14961
     ```
   - .telegram.env
@@ -85,7 +84,6 @@ docker-compose down --volumes
 
 ## Contact me
 
-How can you contact me:
-
-**Gmail: seryurmed@gmail.com**<br>
-**Telegram: t.me.copper_boy**
++ How can you contact me:
+  - sermed512@gmail.com
+  - https://t.me/copper_boy
