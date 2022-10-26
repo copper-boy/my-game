@@ -3,13 +3,13 @@ from functools import lru_cache
 from pydantic import BaseSettings
 
 
-class AuthSiteSettings(BaseSettings):
-    AUTH_SITE_BASE_URL: str
+class AdminSettings(BaseSettings):
+    INFINITY_ADMIN_TOKEN: str
 
 
 @lru_cache()
-def get_auth_site_settings() -> AuthSiteSettings:
-    return AuthSiteSettings()
+def get_admin_settings() -> AdminSettings:
+    return AdminSettings()
 
 
 class DatabaseSettings(BaseSettings):

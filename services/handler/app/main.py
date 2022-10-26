@@ -3,20 +3,12 @@ from json import loads
 from logging import getLogger
 
 from aio_pika import IncomingMessage, connect
-from aiohttp.web import Application, Request, json_response, run_app
+from aiohttp.web import Application, run_app
 
 from app.settings.config import get_amqp_settings
 from app.store import setup_store
 
 logger = getLogger(__name__)
-
-
-async def root(request: Request) -> json_response:
-    logger.info('health check called')
-    return json_response(status=200,
-                         data={
-                             'ping': 'pong'
-                         })
 
 
 async def on_message(message: IncomingMessage) -> None:
@@ -57,8 +49,6 @@ def setup_application() -> Application:
     application = Application()
 
     setup_store(application)
-
-    application.router.add_get('/', root)
 
     application.on_startup.append(setup_rabbitmq)
     application.on_shutdown.append(close_rabbitmq)
