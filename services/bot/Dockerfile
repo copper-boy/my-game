@@ -1,8 +1,10 @@
-FROM python:latest
+FROM python:3.10
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY . .
+
+RUN python -m pip install -q --upgrade pip -r requirements.txt
+
+CMD echo "[+] Run bot" && \
+    python app/main.py

@@ -1,46 +1,6 @@
 version: '3'
 
 services:
-  auth_db:
-    image: postgres:latest
-    volumes:
-      - postgres_data_auth:/var/lib/postgresql/data/
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: ${PG_AUTH_USER}
-      POSTGRES_PASSWORD: ${PG_AUTH_PASSWORD}
-      POSTGRES_DB: ${PG_AUTH_DB}
-    expose:
-      - 5432
-    restart: on-failure
-  auth_service:
-    image: my-game-auth:latest
-    command: bash -c 'while !</dev/tcp/auth_db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0 --port 8956'
-    build: ./services/auth/
-    volumes:
-      - ./services/auth/:/auth/
-    env_file:
-      - .admin.env
-      - .env
-      - .keys.env
-    ports:
-      - '8956:8956'
-    depends_on:
-      - auth_db
-    restart: on-failure
-  bot_service:
-    image: my-game-bot:latest
-    command: python app/main.py
-    build: ./services/bot/
-    volumes:
-      - ./services/bot/:/bot/
-    env_file:
-      - .env
-      - .telegram.env
-    depends_on:
-      - rabbit
-    restart: on-failure
   api_db:
     image: postgres:latest
     volumes:
@@ -56,19 +16,25 @@ services:
     restart: on-failure
   api_service:
     image: my-game-api:latest
-    command: bash -c 'while !</dev/tcp/api_db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0 --port 14961'
     build: ./services/api/
     volumes:
       - ./services/api/:/api/
     env_file:
       - .admin.env
       - .env
-      - .site.env
-    ports:
-      - '14961:14961'
     depends_on:
       - api_db
-      - auth_service
+    restart: on-failure
+  bot_service:
+    image: my-game-bot:latest
+    build: ./services/bot/
+    volumes:
+      - ./services/bot/:/bot/
+    env_file:
+      - .env
+      - .telegram.env
+    depends_on:
+      - rabbit
     restart: on-failure
   handler_db:
     image: postgres:latest
@@ -82,12 +48,9 @@ services:
       POSTGRES_DB: ${PG_HANDLER_DB}
     expose:
       - 5432
-    ports:
-      - '5432:5432'
     restart: on-failure
   handler_service:
     image: my-game-handler:latest
-    command: bash -c "while !</dev/tcp/handler_db/5432; do sleep 1; done; python app/main.py"
     build: ./services/handler
     volumes:
       - ./services/handler/:/handler
@@ -98,9 +61,6 @@ services:
       - .telegram.env
     depends_on:
       - handler_db
-      - api_service
-    ports:
-      - '8080:8080'
     restart: on-failure
   rabbit:
     image: rabbitmq:management
@@ -117,7 +77,6 @@ services:
       - rabbitmq_data:/data
 volumes:
   postgres_data_api:
-  postgres_data_auth:
   postgres_data_handler:
 
   rabbitmq_data:
